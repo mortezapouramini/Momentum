@@ -54,4 +54,25 @@ const verifyEmail = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, verifyEmail };
+/** Log In */
+const loginUser = async (req, res, next) => {
+  try {
+    const { user, refreshToken, accessJwt } = await userService.loginService(
+      req.body,
+    );
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
+    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.set("authorization", `bearer ${accessJwt}`);
+    responder(res, user, null, 200, "Login successful");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { registerUser, verifyEmail, loginUser };

@@ -62,6 +62,73 @@ class TokenService {
     );
     return { rawToken, sessionId: result.rows[0].id };
   };
+
+    /**
+   * Verify user login
+   * Use in auth middleware
+   */
+    verifyAccessJwt = (token) => {
+      return jwt.verify(token, this.accessPublicKey, {
+        algorithms: [this.jwtAlgorithm],
+      });
+    };
+  
+    /** Verify Refresh Token */
+    verifyRefreshToken = async (rawToken) => {
+      if (!rawToken || typeof rawToken !== "string") {
+        return { valid: false, reason: REASONS.INVALID_TOKEN };
+      }
+  
+      const tokenHash = this.hashToken(rawToken);
+  
+      let result;
+  
+      result = await pool.query(
+        `SELECT id, user_id, revoked_at, expires_at
+           FROM refresh_tokens
+           WHERE token_hash = $1`,
+        [tokenHash],
+      );
+  
+      if (result.rowCount === 0) {
+        return { valid: false, reason: REASONS.TOKEN_NOT_FOUND };
+      }
+  
+      const row = result.rows[0];
+  
+      if (row.revoked_at !== null) {
+        return {
+          valid: false,
+          reason: REASONS.SESSION_REVOKED,
+          sessionId: row.id,
+          userId: row.user_id,
+        };
+      }
+  
+      if (new Date(row.expires_at) < new Date()) {
+        return {
+          valid: false,
+          reason: REASONS.SESSION_EXPIRED,
+          sessionId: row.id,
+          userId: row.user_id,
+        };
+      }
+  
+      return { valid: true, sessionId: row.id, userId: row.user_id };
+    };
+  
+    /** Revoke Refresh JWT */
+    revokeRefreshToken = async (rawToken) => {
+      const result = await this.verifyRefreshToken(rawToken);
+  
+      if (result.valid) {
+        await pool.query(
+          `UPDATE refresh_tokens SET revoked_at = now() WHERE id = $1 AND revoked_at IS NULL`,
+          [result.sessionId],
+        );
+        return;
+      }
+    };
 }
 
 module.exports = { tokenService: new TokenService() };

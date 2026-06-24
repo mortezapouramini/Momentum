@@ -1,6 +1,7 @@
 /** Requirements */
 const responder = require("../utils/responder");
 const userService = require("../services/user-service");
+const { tokenService } = require("../services/token-service");
 
 /** Register User */
 const registerUser = async (req, res, next) => {
@@ -75,4 +76,24 @@ const loginUser = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, verifyEmail, loginUser };
+/** Log Out */
+const logOutUser = async (req, res, next) => {
+  try {
+    await tokenService.revokeRefreshToken(req.cookies.refreshToken);
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    };
+    res.clearCookie("refreshToken", cookieOptions);
+    res.clearCookie("uuid", cookieOptions);
+    res.removeHeader("authorization");
+
+    responder(res, null, null, 200, "Logout successful");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { registerUser, verifyEmail, loginUser, logOutUser };

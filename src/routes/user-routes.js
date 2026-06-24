@@ -8,6 +8,6 @@ router
   .post("/verify-email", userController.verifyEmail)
   .post("/login", userController.loginUser)
   .get("/logout", userController.logOutUser)
-  // .get("/refresh-token", userController.getNewRefreshToken);
+  .get("/refresh-token", userController.getNewRefreshToken);
 
 module.exports = router;

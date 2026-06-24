@@ -96,4 +96,42 @@ const logOutUser = async (req, res, next) => {
   }
 };
 
-module.exports = { registerUser, verifyEmail, loginUser, logOutUser };
+/** Get New Refresh Token */
+const getNewRefreshToken = async (req, res, next) => {
+  const userAgent = req.headers["user-agent"];
+  const ipAddress = req.ip;
+  const refreshToken = req.cookies.refreshToken;
+  try {
+    const { rotated, rawToken } = await tokenService.rotateRefreshToken(
+      refreshToken,
+      userAgent,
+      ipAddress,
+    );
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
+    if (rotated && rawToken) {
+      res.cookie("refreshToken", rawToken, cookieOptions);
+      return responder(res, null, null, 200, "Token rotated");
+    }
+    if (!rotated) {
+      res.clearCookie("refreshToken", cookieOptions);
+      res.clearCookie("uuid", cookieOptions);
+      res.removeHeader("authorization");
+
+      return responder(
+        res,
+        null,
+        { redirect: "api/v1/auth/login" },
+        400,
+        "Please login",
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+}
+module.exports = { registerUser, verifyEmail, loginUser, logOutUser , getNewRefreshToken };

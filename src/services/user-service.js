@@ -89,6 +89,40 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
   return { user, accessJwt, refreshToken: rawToken };
 };
 
+/** Log In Service */
+const loginService = async (data) => {
+  let isExist;
+  if (data.email) {
+    isExist = await pool.query("SELECT * FROM users WHERE email = $1", [
+      data.email,
+    ]);
+  } else if (data.userName) {
+    isExist = await pool.query("SELECT * FROM users WHERE user_name = $1", [
+      data.userName,
+    ]);
+  }
 
+  if (isExist.rowCount === 0) {
+    throw appError(401, "Invalid information");
+  }
+  let user = isExist.rows[0];
+  const isMatchPassword = await argon2.verify(
+    user.password_hash,
+    data.password,
+  );
+  if (!isMatchPassword) {
+    throw appError(401, "Invalid information");
+  }
 
-module.exports = {registerService , verifyEmailService}
+  delete user.password_hash;
+  const accessJwt = tokenService.generateAccessJwt(user);
+  const { rawToken, sessionId } = await tokenService.createRefreshSession(
+    user.id,
+    userAgent,
+    ipAddress,
+  );
+
+  return { user, accessJwt, refreshToken: rawToken };
+};
+
+module.exports = { registerService, verifyEmailService, loginService };

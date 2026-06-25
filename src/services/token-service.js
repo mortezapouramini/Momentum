@@ -3,6 +3,14 @@ const jwt = require("jsonwebtoken");
 const { pool } = require("../config/db-config");
 const crypto = require("crypto");
 
+/** Refresh token failure/state reasons */
+const REASONS = {
+  INVALID_TOKEN: "INVALID_TOKEN",
+  TOKEN_NOT_FOUND: "TOKEN_NOT_FOUND",
+  SESSION_REVOKED: "SESSION_REVOKED",
+  SESSION_EXPIRED: "SESSION_EXPIRED",
+};
+
 /** Token Service */
 class TokenService {
   constructor() {

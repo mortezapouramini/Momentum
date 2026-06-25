@@ -57,9 +57,11 @@ const verifyEmail = async (req, res, next) => {
 
 /** Log In */
 const loginUser = async (req, res, next) => {
+  const userAgent = req.headers["user-agent"];
+  const ipAddress = req.ip;
   try {
     const { user, refreshToken, accessJwt } = await userService.loginService(
-      req.body,
+      req.body,userAgent , ipAddress
     );
 
     const cookieOptions = {

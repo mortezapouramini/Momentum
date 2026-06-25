@@ -90,7 +90,7 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
 };
 
 /** Log In Service */
-const loginService = async (data) => {
+const loginService = async (data , userAgent , ipAddress) => {
   let isExist;
   if (data.email) {
     isExist = await pool.query("SELECT * FROM users WHERE email = $1", [

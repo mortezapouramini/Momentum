@@ -61,7 +61,9 @@ const loginUser = async (req, res, next) => {
   const ipAddress = req.ip;
   try {
     const { user, refreshToken, accessJwt } = await userService.loginService(
-      req.body,userAgent , ipAddress
+      req.body,
+      userAgent,
+      ipAddress,
     );
 
     const cookieOptions = {
@@ -124,16 +126,18 @@ const getNewRefreshToken = async (req, res, next) => {
       res.clearCookie("uuid", cookieOptions);
       res.removeHeader("authorization");
 
-      return responder(
-        res,
-        null,
-        { redirect: "api/v1/auth/login" },
-        400,
-        "Please login",
+      return next(
+        appError(400, "Please login", { redirect: "api/v1/auth/login" }),
       );
     }
   } catch (error) {
     next(error);
   }
-}
-module.exports = { registerUser, verifyEmail, loginUser, logOutUser , getNewRefreshToken };
+};
+module.exports = {
+  registerUser,
+  verifyEmail,
+  loginUser,
+  logOutUser,
+  getNewRefreshToken,
+};

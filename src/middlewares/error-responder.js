@@ -1,15 +1,26 @@
 const errorResponder = (err, req, res, next) => {
+  const isValidHttpCode =
+    typeof err.code === "number" &&
+    Number.isInteger(err.code) &&
+    err.code >= 400 &&
+    err.code <= 599;
+
+  const statusCode = isValidHttpCode ? err.code : 500;
+
   const error = {
     success: false,
     body: {
-      code: err.code || 500,
-      message: err.message || null,
-      details: err.details || null,
+      code: statusCode,
+      message: statusCode === 500 ? "Internal server error" : err.message || null,
+      details: statusCode === 500 ? null : err.details || null,
     },
   };
-  res
-    .status(typeof err.code !== "number" || isNaN(err.code) ? 500 : err.code)
-    .json(error);
+
+  if (statusCode === 500) {
+    console.error(err); // Logger
+  }
+
+  res.status(statusCode).json(error);
 };
 
 module.exports = errorResponder;

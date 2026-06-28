@@ -1,5 +1,6 @@
 /** Requirements */
-require("dotenv").config({ path: "../../.env" });
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, "../../.env") });
 const { Worker } = require("bullmq");
 const { redis } = require("../config/redis-config");
 const { sendMail } = require("../config/email-config");

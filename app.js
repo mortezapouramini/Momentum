@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const errorResponder = require("./src/middlewares/error-responder");
-const userRoutes = require("./src/routes//user-routes");
+const userRoutes = require("./src/routes/user-routes");
 
 /** App */
 const app = express();

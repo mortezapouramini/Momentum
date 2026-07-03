@@ -2,6 +2,7 @@
 const responder = require("../utils/responder");
 const userService = require("../services/user-service");
 const { tokenService } = require("../services/token-service");
+const ROUTES = require("../constants/routes");
 
 /** Register User */
 const registerUser = async (req, res, next) => {
@@ -17,7 +18,7 @@ const registerUser = async (req, res, next) => {
     responder(
       res,
       null,
-      { redirect: "/api/v1/auth/verify-email" },
+      { redirect: ROUTES.AUTH.VERIFY_EMAIL},
       200,
       `We've sent a verification code to ${req.body.email}`,
     );
@@ -125,7 +126,7 @@ const getNewRefreshToken = async (req, res, next) => {
       res.removeHeader("authorization");
 
       return next(
-        appError(400, "Please login", { redirect: "/api/v1/auth/login" }),
+        appError(400, "Please login", { redirect: ROUTES.AUTH.LOGIN}),
       );
     }
   } catch (error) {

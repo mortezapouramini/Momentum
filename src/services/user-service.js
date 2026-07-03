@@ -6,6 +6,7 @@ const { redis } = require("../config/redis-config");
 const { emailQueue } = require("../queues/email-queue");
 const argon2 = require("argon2");
 const { tokenService } = require("./token-service");
+const ROUTES = require("../constants/routes");
 
 /** Register Service */
 const registerService = async (data) => {
@@ -56,7 +57,7 @@ const registerService = async (data) => {
 const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
   const pendingUser = await redis.hgetall(`pending:${uuid}`);
   if (Object.keys(pendingUser).length === 0) {
-    throw appError(401, "Registeration timeout");
+    throw appError(401, "Registeration timeout" , {redirect : ROUTES.AUTH.REGISTER});
   }
 
   if (Number(verifyCode) !== Number(pendingUser.verifyCode)) {
@@ -64,7 +65,7 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
     if (Number(pendingUser.attempts) >= 3) {
       await redis.del(`pending:${uuid}`);
       await redis.del(`pending:email:${pendingUser.email}`);
-      throw appError(401, "Registeration timeout");
+      throw appError(401, "Registeration timeout" , {redirect : ROUTES.AUTH.REGISTER});
     }
     await redis.hincrby(`pending:${uuid}`, "attempts", 1);
     throw appError(401, "invalid verification code");

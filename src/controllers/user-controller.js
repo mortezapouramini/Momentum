@@ -69,13 +69,7 @@ const logOutUser = async (req, res, next) => {
   try {
     await tokenService.revokeRefreshToken(req.cookies.refreshToken);
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    };
-    res.clearCookie("refreshToken", cookieOptions);
-    res.clearCookie("uuid", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions.refreshToken);
     res.removeHeader("authorization");
 
     responder(res, null, null, 200, "Logout successful");

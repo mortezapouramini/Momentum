@@ -150,7 +150,7 @@ class TokenService {
   rotateRefreshToken = async (rawToken, userAgent, ipAddress) => {
     const result = await this.verifyRefreshToken(rawToken);
 
-    if (!result.valid) {
+    if (!result.valid) {  
       // یه توکن revoke‌شده دوباره استفاده شده => سیگنال سرقت توکن
       if (
         result.reason === REASONS.SESSION_REVOKED ||
@@ -184,6 +184,12 @@ class TokenService {
         [newSessionId, result.sessionId],
       );
 
+      const user =( await client.query(
+        `SELECT * FROM users WHERE id = $1`,
+        [result.userId]
+      )).rows[0];
+
+      const accessToken = this.generateAccessJwt(user);
       await client.query("COMMIT");
 
       return {
@@ -191,6 +197,7 @@ class TokenService {
         rawToken: newRawToken,
         sessionId: newSessionId,
         userId: result.userId,
+        accessToken: accessToken,
       };
     } catch (error) {
       await client.query("ROLLBACK");

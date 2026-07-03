@@ -106,11 +106,8 @@ const getNewRefreshToken = async (req, res, next) => {
   const ipAddress = req.ip;
   const refreshToken = req.cookies.refreshToken;
   try {
-    const { rotated, rawToken } = await tokenService.rotateRefreshToken(
-      refreshToken,
-      userAgent,
-      ipAddress,
-    );
+    const { rotated, rawToken, accessToken } =
+      await tokenService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -119,6 +116,7 @@ const getNewRefreshToken = async (req, res, next) => {
     };
     if (rotated && rawToken) {
       res.cookie("refreshToken", rawToken, cookieOptions);
+      res.set("authorization", `bearer ${accessToken}`);
       return responder(res, null, null, 200, "Token rotated");
     }
     if (!rotated) {
@@ -127,7 +125,7 @@ const getNewRefreshToken = async (req, res, next) => {
       res.removeHeader("authorization");
 
       return next(
-        appError(400, "Please login", { redirect: "api/v1/auth/login" }),
+        appError(400, "Please login", { redirect: "/api/v1/auth/login" }),
       );
     }
   } catch (error) {

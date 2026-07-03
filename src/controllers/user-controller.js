@@ -13,7 +13,7 @@ const registerUser = async (req, res, next) => {
     responder(
       res,
       null,
-      { redirect: ROUTES.AUTH.VERIFY_EMAIL},
+      { redirect: ROUTES.AUTH.VERIFY_EMAIL },
       200,
       `We've sent a verification code to ${req.body.email}`,
     );
@@ -37,13 +37,8 @@ const verifyEmail = async (req, res, next) => {
         userAgent,
         ipAddress,
       );
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    };
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.clearCookie("uuid", cookieOptions.uuid);
+    res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 201, "registeration successful");
   } catch (error) {
@@ -121,7 +116,7 @@ const getNewRefreshToken = async (req, res, next) => {
       res.removeHeader("authorization");
 
       return next(
-        appError(401, "Please login", { redirect: ROUTES.AUTH.LOGIN}),
+        appError(401, "Please login", { redirect: ROUTES.AUTH.LOGIN }),
       );
     }
   } catch (error) {

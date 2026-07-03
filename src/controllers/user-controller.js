@@ -3,22 +3,17 @@ const responder = require("../utils/responder");
 const userService = require("../services/user-service");
 const { tokenService } = require("../services/token-service");
 const ROUTES = require("../constants/routes");
+const { cookieOptions } = require("../config/cookie-config");
 
 /** Register User */
 const registerUser = async (req, res, next) => {
   try {
     const uuid = await userService.registerService(req.body);
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 5 * 60 * 1000,
-    };
-    res.cookie("uuid", uuid, cookieOptions);
+    res.cookie("uuid", uuid, cookieOptions.uuid);
     responder(
       res,
       null,
-      { redirect: ROUTES.AUTH.VERIFY_EMAIL},
+      { redirect: ROUTES.AUTH.VERIFY_EMAIL },
       200,
       `We've sent a verification code to ${req.body.email}`,
     );
@@ -42,13 +37,8 @@ const verifyEmail = async (req, res, next) => {
         userAgent,
         ipAddress,
       );
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    };
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.clearCookie("uuid", cookieOptions.uuid);
+    res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 201, "registeration successful");
   } catch (error) {
@@ -66,14 +56,7 @@ const loginUser = async (req, res, next) => {
       userAgent,
       ipAddress,
     );
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    };
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 200, "Login successful");
   } catch (error) {
@@ -86,13 +69,7 @@ const logOutUser = async (req, res, next) => {
   try {
     await tokenService.revokeRefreshToken(req.cookies.refreshToken);
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-    };
-    res.clearCookie("refreshToken", cookieOptions);
-    res.clearCookie("uuid", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions.refreshToken);
     res.removeHeader("authorization");
 
     responder(res, null, null, 200, "Logout successful");
@@ -109,24 +86,18 @@ const getNewRefreshToken = async (req, res, next) => {
   try {
     const { rotated, rawToken, accessToken } =
       await tokenService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    };
+
     if (rotated && rawToken) {
-      res.cookie("refreshToken", rawToken, cookieOptions);
+      res.cookie("refreshToken", rawToken, cookieOptions.refreshToken);
       res.set("authorization", `bearer ${accessToken}`);
       return responder(res, null, null, 200, "Token rotated");
     }
     if (!rotated) {
-      res.clearCookie("refreshToken", cookieOptions);
-      res.clearCookie("uuid", cookieOptions);
+      res.clearCookie("refreshToken", cookieOptions.refreshToken);
       res.removeHeader("authorization");
 
       return next(
-        appError(401, "Please login", { redirect: ROUTES.AUTH.LOGIN}),
+        appError(401, "Please login", { redirect: ROUTES.AUTH.LOGIN }),
       );
     }
   } catch (error) {

@@ -14,7 +14,7 @@ const registerService = async (data) => {
     [data.email, data.userName],
   );
   if (isExist.rowCount > 0) {
-    throw appError(401, "invalid informations");
+    throw appError(409, "invalid informations");
   }
 
   const existingUUID = await redis.get(`pending:email:${data.email}`);

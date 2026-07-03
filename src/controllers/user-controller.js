@@ -3,18 +3,13 @@ const responder = require("../utils/responder");
 const userService = require("../services/user-service");
 const { tokenService } = require("../services/token-service");
 const ROUTES = require("../constants/routes");
+const { cookieOptions } = require("../config/cookie-config");
 
 /** Register User */
 const registerUser = async (req, res, next) => {
   try {
     const uuid = await userService.registerService(req.body);
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 5 * 60 * 1000,
-    };
-    res.cookie("uuid", uuid, cookieOptions);
+    res.cookie("uuid", uuid, cookieOptions.uuid);
     responder(
       res,
       null,

@@ -86,20 +86,14 @@ const getNewRefreshToken = async (req, res, next) => {
   try {
     const { rotated, rawToken, accessToken } =
       await tokenService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    };
+
     if (rotated && rawToken) {
-      res.cookie("refreshToken", rawToken, cookieOptions);
+      res.cookie("refreshToken", rawToken, cookieOptions.refreshToken);
       res.set("authorization", `bearer ${accessToken}`);
       return responder(res, null, null, 200, "Token rotated");
     }
     if (!rotated) {
-      res.clearCookie("refreshToken", cookieOptions);
-      res.clearCookie("uuid", cookieOptions);
+      res.clearCookie("refreshToken", cookieOptions.refreshToken);
       res.removeHeader("authorization");
 
       return next(

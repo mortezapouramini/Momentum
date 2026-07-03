@@ -17,7 +17,7 @@ const registerUser = async (req, res, next) => {
     responder(
       res,
       null,
-      { redirect: "api/v1/auth/verify-email" },
+      { redirect: "/api/v1/auth/verify-email" },
       200,
       `We've sent a verification code to ${req.body.email}`,
     );

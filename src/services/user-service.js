@@ -57,7 +57,7 @@ const registerService = async (data) => {
 const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
   const pendingUser = await redis.hgetall(`pending:${uuid}`);
   if (Object.keys(pendingUser).length === 0) {
-    throw appError(401, "Registeration timeout" , {redirect : ROUTES.AUTH.REGISTER});
+    throw appError(404, "Registeration timeout" , {redirect : ROUTES.AUTH.REGISTER});
   }
 
   if (Number(verifyCode) !== Number(pendingUser.verifyCode)) {
@@ -65,10 +65,10 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
     if (Number(pendingUser.attempts) >= 3) {
       await redis.del(`pending:${uuid}`);
       await redis.del(`pending:email:${pendingUser.email}`);
-      throw appError(401, "Registeration timeout" , {redirect : ROUTES.AUTH.REGISTER});
+      throw appError(429, "To many requests" , {redirect : ROUTES.AUTH.REGISTER});
     }
     await redis.hincrby(`pending:${uuid}`, "attempts", 1);
-    throw appError(401, "invalid verification code");
+    throw appError(400, "invalid verification code");
   }
 
   const result = await pool.query(
@@ -109,7 +109,7 @@ const loginService = async (data, userAgent, ipAddress) => {
   }
 
   if (isExist.rowCount === 0) {
-    throw appError(404, "Invalid information");
+    throw appError(401, "Invalid information");
   }
   let user = isExist.rows[0];
   const isMatchPassword = await argon2.verify(

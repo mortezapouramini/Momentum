@@ -56,14 +56,7 @@ const loginUser = async (req, res, next) => {
       userAgent,
       ipAddress,
     );
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    };
-    res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 200, "Login successful");
   } catch (error) {

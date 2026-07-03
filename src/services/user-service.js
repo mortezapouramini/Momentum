@@ -90,20 +90,25 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
 };
 
 /** Log In Service */
-const loginService = async (data , userAgent , ipAddress) => {
+const loginService = async (data, userAgent, ipAddress) => {
+  /** Soon will be implemented in Joi validation
+   * Check user data in Joi validation
+   * if email is provided, check if the user exists by email
+   * if not provided, check if the user exists by user name
+   * */
   let isExist;
   if (data.email) {
     isExist = await pool.query("SELECT * FROM users WHERE email = $1", [
       data.email,
     ]);
-  } else if (data.userName) {
+  } else {
     isExist = await pool.query("SELECT * FROM users WHERE user_name = $1", [
       data.userName,
     ]);
   }
 
   if (isExist.rowCount === 0) {
-    throw appError(401, "Invalid information");
+    throw appError(404, "Invalid information");
   }
   let user = isExist.rows[0];
   const isMatchPassword = await argon2.verify(

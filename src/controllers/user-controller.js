@@ -4,6 +4,7 @@ const userService = require("../services/user-service");
 const { tokenService } = require("../services/token-service");
 const ROUTES = require("../constants/routes");
 const { cookieOptions } = require("../config/cookie-config");
+const appError = require("../utils/error-util");
 
 /** Register User */
 const registerUser = async (req, res, next) => {

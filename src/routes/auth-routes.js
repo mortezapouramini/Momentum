@@ -1,13 +1,13 @@
 /** Requirements */
 const router = require("express").Router();
-const userController = require("../controllers/user-controller");
+const authController = require("../controllers/auth-controller");
 
 /** Endpoints */
 router
-  .post("/register", userController.registerUser)
-  .post("/verify-email", userController.verifyEmail)
-  .post("/login", userController.loginUser)
-  .get("/logout", userController.logOutUser)
-  .get("/refresh-token", userController.getNewRefreshToken);
+  .post("/register", authController.registerUser)
+  .post("/verify-email", authController.verifyEmail)
+  .post("/login", authController.loginUser)
+  .get("/logout", authController.logOutUser)
+  .get("/refresh-token", authController.getNewRefreshToken);
 
 module.exports = router;

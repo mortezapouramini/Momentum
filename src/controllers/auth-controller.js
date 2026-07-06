@@ -1,6 +1,6 @@
 /** Requirements */
 const responder = require("../utils/responder");
-const userService = require("../services/user-service");
+const authService = require("../services/auth-service");
 const { tokenService } = require("../services/token-service");
 const ROUTES = require("../constants/routes");
 const { cookieOptions } = require("../config/cookie-config");
@@ -9,7 +9,7 @@ const appError = require("../utils/error-util");
 /** Register User */
 const registerUser = async (req, res, next) => {
   try {
-    const uuid = await userService.registerService(req.body);
+    const uuid = await authService.registerService(req.body);
     res.cookie("uuid", uuid, cookieOptions.uuid);
     responder(
       res,
@@ -32,7 +32,7 @@ const verifyEmail = async (req, res, next) => {
 
   try {
     const { user, accessJwt, refreshToken } =
-      await userService.verifyEmailService(
+      await authService.verifyEmailService(
         uuid,
         verifyCode,
         userAgent,
@@ -52,7 +52,7 @@ const loginUser = async (req, res, next) => {
   const userAgent = req.headers["user-agent"];
   const ipAddress = req.ip;
   try {
-    const { user, refreshToken, accessJwt } = await userService.loginService(
+    const { user, refreshToken, accessJwt } = await authService.loginService(
       req.body,
       userAgent,
       ipAddress,

@@ -98,4 +98,22 @@ const updateTaskService = async (taskId, taskData, userData) => {
   return result.rows[0];
 };
 
-module.exports = { createTaskService, deleteTaskService, updateTaskService };
+const getSingleTaskService = async (taskId, userData) => {
+  const userId = userData.sub;
+  const query = `
+      SELECT * FROM tasks WHERE id = $1 AND user_id = $2
+  `;
+  const result = await pool.query(query, [taskId, userId]);
+  if (result.rowCount === 0) {
+    throw appError(404, "Task not found");
+  }
+
+  return result.rows[0];
+};
+
+module.exports = {
+  createTaskService,
+  deleteTaskService,
+  updateTaskService,
+  getSingleTaskService,
+};

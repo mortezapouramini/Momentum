@@ -19,4 +19,17 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
-module.exports = { createTask, deleteTask };
+const updateTask = async (req, res, next) => {
+  try {
+    const updatedTask = await taskService.updateTaskService(
+      req.params.id,
+      req.body,
+      req.user
+    );
+    responder(res, updatedTask, null, 200, "Task updated");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createTask, deleteTask, updateTask };

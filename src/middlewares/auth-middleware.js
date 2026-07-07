@@ -7,7 +7,9 @@ const authAccessToken = (req, res, next) => {
 
   if (!accessJwt) {
     return next(
-      appError(401, "Invalid Token", { redirect: "/api/v1/auth/refresh-token" }),
+      appError(401, "Invalid Token", {
+        redirect: "/api/v1/auth/refresh-token",
+      }),
     );
   }
 
@@ -18,16 +20,22 @@ const authAccessToken = (req, res, next) => {
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      return next(appError(401, "Token expired" , { redirect: "/api/v1/auth/refresh-token" }));
+      return next(
+        appError(401, "Token expired", {
+          redirect: "/api/v1/auth/refresh-token",
+        }),
+      );
     }
     if (error.name === "JsonWebTokenError") {
-      return next(appError(401, "Invalid token", { redirect: "/api/v1/auth/refresh-token" }));
+      return next(
+        appError(401, "Invalid token", {
+          redirect: "/api/v1/auth/refresh-token",
+        }),
+      );
     }
     next(error);
   }
 };
-
-module.exports = authAccessToken;
 
 module.exports = {
   authAccessToken,

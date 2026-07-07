@@ -38,7 +38,7 @@ const getSingleTask = async (req, res, next) => {
       req.params.id,
       req.user,
     );
-    responder(res, task, null, 200, "Task updated");
+    responder(res, task, null, 200, "Task Recived");
   } catch (error) {
     next(error);
   }

@@ -98,7 +98,7 @@ const updateTaskService = async (taskId, taskData, userData) => {
   return result.rows[0];
 };
 
-const getSingleTask = async (taskId, userData) => {
+const getSingleTaskService = async (taskId, userData) => {
   const userId = userData.sub;
   const query = `
       SELECT * FROM tasks WHERE id = $1 AND user_id = $2
@@ -115,5 +115,5 @@ module.exports = {
   createTaskService,
   deleteTaskService,
   updateTaskService,
-  getSingleTask,
+  getSingleTaskService,
 };

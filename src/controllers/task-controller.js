@@ -1,5 +1,6 @@
 const responder = require("../utils/responder");
 const taskService = require("../services/task-service");
+
 const createTask = async (req, res, next) => {
   try {
     const newTask = await taskService.createTaskService(req.body, req.user);
@@ -9,6 +10,13 @@ const createTask = async (req, res, next) => {
   }
 };
 
-module.exports = {
-  createTask,
+const deleteTask = async (req, res, next) => {
+  try {
+    await taskService.deleteTaskService(req.params.id, req.user);
+    responder(res, null, null, 200, "Task deleted");
+  } catch (error) {
+    next(error);
+  }
 };
+
+module.exports = { createTask, deleteTask };

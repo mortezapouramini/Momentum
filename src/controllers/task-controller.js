@@ -24,7 +24,7 @@ const updateTask = async (req, res, next) => {
     const updatedTask = await taskService.updateTaskService(
       req.params.id,
       req.body,
-      req.user
+      req.user,
     );
     responder(res, updatedTask, null, 200, "Task updated");
   } catch (error) {
@@ -32,4 +32,16 @@ const updateTask = async (req, res, next) => {
   }
 };
 
-module.exports = { createTask, deleteTask, updateTask };
+const getSingleTask = async (req, res, next) => {
+  try {
+    const task = await taskService.getSingleTaskService(
+      req.params.id,
+      req.user,
+    );
+    responder(res, task, null, 200, "Task updated");
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { createTask, deleteTask, updateTask, getSingleTask };

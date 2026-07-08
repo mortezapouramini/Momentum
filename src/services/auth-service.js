@@ -105,32 +105,27 @@ const loginService = async (data, userAgent, ipAddress) => {
    * if email is provided, check if the user exists by email
    * if not provided, check if the user exists by user name
    * */
-  let isExist;
+  let user;
   if (data.email) {
-    isExist = await pool.query("SELECT * FROM users WHERE email = $1", [
-      data.email,
-    ]);
+    user = await findUserByEmail(data.email);
   } else {
-    isExist = await pool.query("SELECT * FROM users WHERE user_name = $1", [
-      data.userName,
-    ]);
+    user = await findUserByUserName(data.userName);
   }
 
-  if (isExist.rowCount === 0) {
-    throw appError(401, "Invalid information");
+  if (!user) {
+    throw appError(401, "Invalid credentials");
   }
-  let user = isExist.rows[0];
   const isMatchPassword = await argon2.verify(
     user.password_hash,
     data.password,
   );
   if (!isMatchPassword) {
-    throw appError(401, "Invalid information");
+    throw appError(401, "Invalid credentials");
   }
 
   delete user.password_hash;
   const accessJwt = tokenService.generateAccessJwt(user);
-  const { rawToken, sessionId } = await tokenService.createRefreshSession(
+  const { rawToken } = await tokenService.createRefreshSession(
     user.id,
     userAgent,
     ipAddress,

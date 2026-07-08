@@ -7,15 +7,20 @@ const { emailQueue } = require("../queues/email-queue");
 const argon2 = require("argon2");
 const { tokenService } = require("./token-service");
 const ROUTES = require("../constants/routes");
+const {
+  findUserByEmail,
+  findUserByUserName,
+  createUser,
+} = require("../repository/auth-repository");
 
 /** Register Service */
 const registerService = async (data) => {
-  let isExist = await pool.query(
-    `SELECT * FROM users WHERE email = $1 OR user_name = $2`,
-    [data.email, data.userName],
-  );
-  if (isExist.rowCount > 0) {
-    throw appError(409, "invalid informations");
+  const user =
+    (await findUserByEmail(data.email)) ||
+    (await findUserByUserName(data.userName));
+
+  if (user) {
+    throw appError(409, "invalid credentials");
   }
 
   const existingUUID = await redis.get(`pending:email:${data.email}`);
@@ -23,14 +28,14 @@ const registerService = async (data) => {
     return existingUUID;
   }
 
-  const password_hash = await argon2.hash(data.password);
+  const passwordHash = await argon2.hash(data.password);
   const uuid = crypto.randomUUID();
   const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   const userData = {
     email: data.email,
     userName: data.userName,
-    password_hash,
+    passwordHash,
     verifyCode,
     attempts: "0",
   };
@@ -57,7 +62,9 @@ const registerService = async (data) => {
 const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
   const pendingUser = await redis.hgetall(`pending:${uuid}`);
   if (Object.keys(pendingUser).length === 0) {
-    throw appError(404, "Registeration timeout" , {redirect : ROUTES.AUTH.REGISTER});
+    throw appError(404, "Registeration timeout", {
+      redirect: ROUTES.AUTH.REGISTER,
+    });
   }
 
   if (Number(verifyCode) !== Number(pendingUser.verifyCode)) {
@@ -65,21 +72,22 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
     if (Number(pendingUser.attempts) >= 3) {
       await redis.del(`pending:${uuid}`);
       await redis.del(`pending:email:${pendingUser.email}`);
-      throw appError(429, "To many requests" , {redirect : ROUTES.AUTH.REGISTER});
+      throw appError(429, "Too many requests", {
+        redirect: ROUTES.AUTH.REGISTER,
+      });
     }
     await redis.hincrby(`pending:${uuid}`, "attempts", 1);
     throw appError(400, "invalid verification code");
   }
 
-  const result = await pool.query(
-    `INSERT INTO users(user_name , email , password_hash) VALUES( $1 , $2 , $3) RETURNING*`,
-    [pendingUser.userName, pendingUser.email, pendingUser.password_hash],
+  const user = await createUser(
+    pendingUser.userName,
+    pendingUser.email,
+    pendingUser.passwordHash,
   );
-  const user = result.rows[0];
-  delete user.password_hash;
 
   const accessJwt = tokenService.generateAccessJwt(user);
-  const { rawToken, sessionId } = await tokenService.createRefreshSession(
+  const { rawToken } = await tokenService.createRefreshSession(
     user.id,
     userAgent,
     ipAddress,

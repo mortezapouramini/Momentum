@@ -52,7 +52,7 @@ const updateTaskService = async (taskId, taskData, userId) => {
     throw appError(400, "No fields to update");
   }
 
-  const task = await updateTaskById(fields, values, userId, taskId);
+  const task = await updateTaskById(fields, values, taskId, userId);
   if (!task) {
     throw appError(404, "Task not found");
   }

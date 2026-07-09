@@ -100,11 +100,7 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
 
 /** Log In Service */
 const loginService = async (data, userAgent, ipAddress) => {
-  /** Soon will be implemented in Joi validation
-   * Check user data in Joi validation
-   * if email is provided, check if the user exists by email
-   * if not provided, check if the user exists by user name
-   * */
+
   let user;
   if (data.email) {
     user = await findUserByEmail(data.email);

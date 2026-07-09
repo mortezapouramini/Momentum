@@ -3,6 +3,7 @@ const {
   insertTask,
   deleteTaskById,
   updateTaskById,
+  getTaskById,
 } = require("../repository/task-repository");
 const appError = require("../utils/error-util");
 
@@ -16,17 +17,17 @@ const createTaskService = async (taskData, userId) => {
     dueDate: taskData.dueDate || null,
   };
 
-  const result = await insertTask(insertData);
+  const task = await insertTask(insertData);
 
-  return result;
+  return task;
 };
 
 const deleteTaskService = async (taskId, userId) => {
-  const result = await deleteTaskById(taskId, userId);
-  if (!result) {
+  const task = await deleteTaskById(taskId, userId);
+  if (!task) {
     throw appError(404, "Task not found");
   }
-  return result;
+  return task;
 };
 
 const updateTaskService = async (taskId, taskData, userId) => {
@@ -52,24 +53,19 @@ const updateTaskService = async (taskId, taskData, userId) => {
     throw appError(400, "No fields to update");
   }
 
-  const result = await updateTaskById(fields, values, userId, taskId);
-  if (!result) {
+  const task = await updateTaskById(fields, values, userId, taskId);
+  if (!task) {
     throw appError(404, "Task not found");
   }
-  return result;
+  return task;
 };
 
-const getSingleTaskService = async (taskId, userData) => {
-  const userId = userData.sub;
-  const query = `
-      SELECT * FROM tasks WHERE id = $1 AND user_id = $2
-  `;
-  const result = await pool.query(query, [taskId, userId]);
-  if (result.rowCount === 0) {
+const getSingleTaskService = async (taskId, userId) => {
+  const task = await getTaskById(taskId, userId);
+  if (!task) {
     throw appError(404, "Task not found");
   }
-
-  return result.rows[0];
+  return task;
 };
 
 module.exports = {

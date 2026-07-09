@@ -24,13 +24,20 @@ src/
 ├── controllers/    # Request handling and response formatting
 ├── middlewares/    # Auth middleware and error handler
 ├── queues/         # BullMQ email queue
+├── repository/     # Direct database queries (no business logic)
 ├── routes/         # Route definitions
-├── services/       # Business logic
+├── services/       # Business logic only
 ├── utils/          # AppError and responder helpers
 └── workers/        # BullMQ email worker
 ```
 
-Follows a layered architecture: `routes → controllers → services → database`
+Follows a layered architecture: `routes → controllers → services → repository → database`
+
+Each layer has a single responsibility:
+
+- **Controllers**: parse requests, send responses
+- **Services**: business logic and validation
+- **Repositories**: all direct database queries, no logic
 
 ---
 
@@ -48,23 +55,23 @@ Follows a layered architecture: `routes → controllers → services → databas
 
 ### Auth
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/v1/auth/register` | Register a new user | — |
-| `POST` | `/api/v1/auth/verify-email` | Verify email with code | — |
-| `POST` | `/api/v1/auth/login` | Login with email or username | — |
-| `GET` | `/api/v1/auth/logout` | Logout and revoke session | — |
-| `GET` | `/api/v1/auth/refresh-token` | Rotate refresh token | — |
+| Method | Endpoint                     | Description                  | Auth |
+| ------ | ---------------------------- | ---------------------------- | ---- |
+| `POST` | `/api/v1/auth/register`      | Register a new user          | —    |
+| `POST` | `/api/v1/auth/verify-email`  | Verify email with code       | —    |
+| `POST` | `/api/v1/auth/login`         | Login with email or username | —    |
+| `GET`  | `/api/v1/auth/logout`        | Logout and revoke session    | —    |
+| `GET`  | `/api/v1/auth/refresh-token` | Rotate refresh token         | —    |
 
-### Tasks *(in progress)*
+### Tasks _(in progress)_
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| `POST` | `/api/v1/tasks` | Create a new task | ✅ |
-| `GET` | `/api/v1/tasks` | List all tasks for current user | ✅ |
-| `GET` | `/api/v1/tasks/:id` | Get a single task | ✅ |
-| `PATCH` | `/api/v1/tasks/:id` | Update a task | ✅ |
-| `DELETE` | `/api/v1/tasks/:id` | Delete a task | ✅ |
+| Method   | Endpoint            | Description                     | Auth |
+| -------- | ------------------- | ------------------------------- | ---- |
+| `POST`   | `/api/v1/tasks`     | Create a new task               | ✅   |
+| `GET`    | `/api/v1/tasks`     | List all tasks for current user | ✅   |
+| `GET`    | `/api/v1/tasks/:id` | Get a single task               | ✅   |
+| `PATCH`  | `/api/v1/tasks/:id` | Update a task                   | ✅   |
+| `DELETE` | `/api/v1/tasks/:id` | Delete a task                   | ✅   |
 
 ---
 
@@ -155,6 +162,21 @@ CREATE TABLE refresh_tokens (
   expires_at  TIMESTAMPTZ NOT NULL,
   revoked_at  TIMESTAMPTZ,
   replaced_by VARCHAR(128) DEFAULT NULL
+);
+
+-- Tasks (in progress)
+CREATE TABLE tasks (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title       VARCHAR(255) NOT NULL,
+  description TEXT,
+  priority    VARCHAR(20) NOT NULL DEFAULT 'low' 
+              CHECK(priority IN ('low' , 'medium', 'high')),
+  status      VARCHAR(20) NOT NULL DEFAULT 'pending'
+              CHECK (status IN ('pending', 'in-progress', 'done')),
+  due_date    TIMESTAMPTZ DEFAULT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 

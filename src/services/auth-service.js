@@ -1,5 +1,4 @@
 /** Requirements */
-const { pool } = require("../config/db-config");
 const appError = require("../utils/error-util");
 const crypto = require("crypto");
 const { redis } = require("../config/redis-config");
@@ -20,7 +19,7 @@ const registerService = async (data) => {
     (await findUserByUserName(data.userName));
 
   if (user) {
-    throw appError(409, "invalid credentials");
+    throw appError(409, "Registration failed");
   }
 
   const existingUUID = await redis.get(`pending:email:${data.email}`);
@@ -68,7 +67,6 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
   }
 
   if (Number(verifyCode) !== Number(pendingUser.verifyCode)) {
-    // increment attempts
     if (Number(pendingUser.attempts) >= 3) {
       await redis.del(`pending:${uuid}`);
       await redis.del(`pending:email:${pendingUser.email}`);

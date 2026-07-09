@@ -2,9 +2,9 @@ const { pool } = require("../config/db-config");
 const { insertTask } = require("../repository/task-repository");
 const appError = require("../utils/error-util");
 
-const createTaskService = async (taskData, userData) => {
+const createTaskService = async (taskData, userId) => {
   const insertData = {
-    userId: userData.sub,
+    userId,
     title: taskData.title,
     description: taskData.description ?? null,
     priority: taskData.priority || "low",

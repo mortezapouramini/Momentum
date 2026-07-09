@@ -27,7 +27,7 @@ const updateTask = async (req, res, next) => {
     const updatedTask = await taskService.updateTaskService(
       req.params.id,
       req.body,
-      req.user,
+      req.user.id,
     );
     responder(res, updatedTask, null, 200, "Task updated");
   } catch (error) {

@@ -1,5 +1,5 @@
 const { pool } = require("../config/db-config");
-const { insertTask } = require("../repository/task-repository");
+const { insertTask, deleteTaskById } = require("../repository/task-repository");
 const appError = require("../utils/error-util");
 
 const createTaskService = async (taskData, userId) => {
@@ -17,24 +17,12 @@ const createTaskService = async (taskData, userId) => {
   return result;
 };
 
-const deleteTaskService = async (taskId, userData) => {
-  const userId = userData.sub;
-
-  const checkQuery = `
-    SELECT id FROM tasks 
-    WHERE id = $1 AND user_id = $2
-  `;
-  const existing = await pool.query(checkQuery, [taskId, userId]);
-
-  if (existing.rowCount === 0) {
+const deleteTaskService = async (taskId, userId) => {
+  const result = await deleteTaskById(taskId, userId);
+  if (!result) {
     throw appError(404, "Task not found");
   }
-
-  const deleteQuery = `
-    DELETE FROM tasks 
-    WHERE id = $1 AND user_id = $2
-  `;
-  await pool.query(deleteQuery, [taskId, userId]);
+  return result;
 };
 
 const updateTaskService = async (taskId, taskData, userData) => {

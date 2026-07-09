@@ -12,8 +12,11 @@ const createTask = async (req, res, next) => {
 
 const deleteTask = async (req, res, next) => {
   try {
-    await taskService.deleteTaskService(req.params.id, req.user);
-    responder(res, null, null, 200, "Task deleted");
+    const deletedTask = await taskService.deleteTaskService(
+      req.params.id,
+      req.user.sub,
+    );
+    responder(res, deletedTask, null, 200, "Task deleted");
   } catch (error) {
     next(error);
   }

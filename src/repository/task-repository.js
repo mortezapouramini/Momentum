@@ -19,7 +19,16 @@ const insertTask = async (taskData) => {
   ).rows[0];
 };
 
+const deleteTaskById = async (taskId, userId) => {
+  const query = `
+    DELETE FROM tasks 
+    WHERE id = $1 AND user_id = $2
+    RETURNING*
+  `;
+  return (await pool.query(query, [taskId, userId])).rows[0];
+};
 
 module.exports = {
-    insertTask
-}
+  insertTask,
+  deleteTaskById
+};

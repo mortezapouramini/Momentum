@@ -1,4 +1,3 @@
-const { pool } = require("../config/db-config");
 const {
   insertTask,
   deleteTaskById,

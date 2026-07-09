@@ -2,6 +2,7 @@
 const jwt = require("jsonwebtoken");
 const { pool } = require("../config/db-config");
 const crypto = require("crypto");
+const { createSession } = require("../repository/auth-repository");
 
 /** Refresh token failure/state reasons */
 const REASONS = {
@@ -64,11 +65,8 @@ class TokenService {
     const tokenHash = this.hashToken(rawToken);
     const expiresAt = new Date(Date.now() + this.refreshTokenExpiry * 1000);
 
-    const result = await pool.query(
-      `INSERT INTO refresh_tokens(token_hash , user_id , expires_at, user_agent , ip_address) VALUES($1 , $2 , $3 , $4 , $5) RETURNING id`,
-      [tokenHash, userId, expiresAt, userAgent, ipAddress],
-    );
-    return { rawToken, sessionId: result.rows[0].id };
+    await createSession(tokenHash, userId, expiresAt, userAgent, ipAddress);
+    return { rawToken };
   };
 
   /**
@@ -150,7 +148,7 @@ class TokenService {
   rotateRefreshToken = async (rawToken, userAgent, ipAddress) => {
     const result = await this.verifyRefreshToken(rawToken);
 
-    if (!result.valid) {  
+    if (!result.valid) {
       // یه توکن revoke‌شده دوباره استفاده شده => سیگنال سرقت توکن
       if (
         result.reason === REASONS.SESSION_REVOKED ||
@@ -184,10 +182,9 @@ class TokenService {
         [newSessionId, result.sessionId],
       );
 
-      const user =( await client.query(
-        `SELECT * FROM users WHERE id = $1`,
-        [result.userId]
-      )).rows[0];
+      const user = (
+        await client.query(`SELECT * FROM users WHERE id = $1`, [result.userId])
+      ).rows[0];
 
       const accessToken = this.generateAccessJwt(user);
       await client.query("COMMIT");

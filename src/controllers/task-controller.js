@@ -39,7 +39,7 @@ const getSingleTask = async (req, res, next) => {
   try {
     const task = await taskService.getSingleTaskService(
       req.params.id,
-      req.user,
+      req.user.id,
     );
     responder(res, task, null, 200, "Task Recived");
   } catch (error) {

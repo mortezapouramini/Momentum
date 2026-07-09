@@ -1,5 +1,9 @@
 const { pool } = require("../config/db-config");
-const { insertTask, deleteTaskById } = require("../repository/task-repository");
+const {
+  insertTask,
+  deleteTaskById,
+  updateTaskById,
+} = require("../repository/task-repository");
 const appError = require("../utils/error-util");
 
 const createTaskService = async (taskData, userId) => {
@@ -25,15 +29,7 @@ const deleteTaskService = async (taskId, userId) => {
   return result;
 };
 
-const updateTaskService = async (taskId, taskData, userData) => {
-  const userId = userData.sub;
-
-  const checkQuery = `SELECT id FROM tasks WHERE id = $1 AND user_id = $2`;
-  const existing = await pool.query(checkQuery, [taskId, userId]);
-  if (existing.rowCount === 0) {
-    throw appError(404, "Task not found");
-  }
-
+const updateTaskService = async (taskId, taskData, userId) => {
   const UPDATABLE_FIELDS = {
     title: "title",
     description: "description",
@@ -52,27 +48,15 @@ const updateTaskService = async (taskId, taskData, userData) => {
       values.push(taskData[key]);
     }
   }
-
   if (fields.length === 0) {
     throw appError(400, "No fields to update");
   }
 
-  fields.push(`updated_at = $${index++}`);
-  values.push(new Date());
-
-  const taskIdIndex = index++;
-  const userIdIndex = index++;
-  values.push(taskId, userId);
-
-  const updateQuery = `
-    UPDATE tasks 
-    SET ${fields.join(", ")}
-    WHERE id = $${taskIdIndex} AND user_id = $${userIdIndex}
-    RETURNING *
-  `;
-
-  const result = await pool.query(updateQuery, values);
-  return result.rows[0];
+  const result = await updateTaskById(fields, values, userId, taskId);
+  if (!result) {
+    throw appError(404, "Task not found");
+  }
+  return result;
 };
 
 const getSingleTaskService = async (taskId, userData) => {

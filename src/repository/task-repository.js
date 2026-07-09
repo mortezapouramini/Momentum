@@ -28,7 +28,20 @@ const deleteTaskById = async (taskId, userId) => {
   return (await pool.query(query, [taskId, userId])).rows[0];
 };
 
+const updateTaskById = async (fields, values, taskId, userId) => {
+  fields.push(`updated_at = $${index++}`);
+  values.push(new Date());
+  const query = `
+    UPDATE tasks 
+    SET ${fields.join(", ")}
+    WHERE id = $${fields.length + 1} AND user_id = $${fields.length + 2}
+    RETURNING *
+  `;
+  return (await pool.query(query, [...values, taskId, userId])).rows[0];
+};
+
 module.exports = {
   insertTask,
-  deleteTaskById
+  deleteTaskById,
+  updateTaskById,
 };

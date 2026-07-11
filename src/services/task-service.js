@@ -3,6 +3,8 @@ const {
   deleteTaskById,
   updateTaskById,
   getTaskById,
+  getTasksByUserId,
+  getTasksByFilters,
 } = require("../repository/task-repository");
 const appError = require("../utils/error-util");
 
@@ -38,21 +40,11 @@ const updateTaskService = async (taskId, taskData, userId) => {
     dueDate: "due_date",
   };
 
-  const fields = [];
-  const values = [];
-  let index = 1;
-
-  for (const [key, column] of Object.entries(UPDATABLE_FIELDS)) {
-    if (taskData[key] !== undefined) {
-      fields.push(`${column} = $${index++}`);
-      values.push(taskData[key]);
-    }
-  }
-  if (fields.length === 0) {
+  if (Object.keys(taskData).length === 0) {
     throw appError(400, "No fields to update");
   }
 
-  const task = await updateTaskById(fields, values, taskId, userId);
+  const task = await updateTaskById(taskData, UPDATABLE_FIELDS, taskId, userId);
   if (!task) {
     throw appError(404, "Task not found");
   }
@@ -67,9 +59,18 @@ const getSingleTaskService = async (taskId, userId) => {
   return task;
 };
 
+const getTasksService = async (userId, filters) => {
+  if(Object.keys(filters).length === 0){
+    return await getTasksByUserId(userId)
+  }
+  return await getTasksByFilters(userId, filters);
+};
+
+
 module.exports = {
   createTaskService,
   deleteTaskService,
   updateTaskService,
   getSingleTaskService,
+  getTasksService
 };

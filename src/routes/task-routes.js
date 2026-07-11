@@ -8,6 +8,6 @@ router
   .delete("/:id", authMiddleware.authAccessToken, taskController.deleteTask)
   .patch("/:id", authMiddleware.authAccessToken, taskController.updateTask)
   .get("/:id", authMiddleware.authAccessToken, taskController.getSingleTask)
-  .get('/' , authMiddleware.authAccessToken , taskController.getTasks)
+  .get("/" , authMiddleware.authAccessToken , taskController.getTasks)
 
 module.exports = router;

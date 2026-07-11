@@ -43,6 +43,9 @@ const verifyEmail = async (req, res, next) => {
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 201, "registeration successful");
   } catch (error) {
+    if(error.code === 429){
+      res.clearCookie("uuid", cookieOptions.uuid);
+    }
     next(error);
   }
 };

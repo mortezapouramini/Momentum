@@ -193,7 +193,7 @@ class TokenService {
         rotated: true,
         rawToken: newRawToken,
         sessionId: newSessionId,
-        userId: result.userId,
+        user,
         accessToken: accessToken,
       };
     } catch (error) {

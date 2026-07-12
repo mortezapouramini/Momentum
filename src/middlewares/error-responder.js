@@ -16,9 +16,8 @@ const errorResponder = (err, req, res, next) => {
     },
   };
 
-  if (statusCode === 500) {
-    console.error(err); // Logger
-  }
+  console.error(err); // Logger
+
 
   res.status(statusCode).json(error);
 };

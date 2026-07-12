@@ -43,7 +43,7 @@ const verifyEmail = async (req, res, next) => {
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 201, "registeration successful");
   } catch (error) {
-    if(error.code === 429){
+    if(error.code === 429 || error.code === 404){
       res.clearCookie("uuid", cookieOptions.uuid);
     }
     next(error);
@@ -88,13 +88,13 @@ const getNewRefreshToken = async (req, res, next) => {
   const ipAddress = req.ip;
   const refreshToken = req.cookies.refreshToken;
   try {
-    const { rotated, rawToken, accessToken } =
+    const { rotated, rawToken, accessToken , user } =
       await tokenService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
 
     if (rotated && rawToken) {
       res.cookie("refreshToken", rawToken, cookieOptions.refreshToken);
       res.set("authorization", `bearer ${accessToken}`);
-      return responder(res, null, null, 200, "Token rotated");
+      return responder(res, user, null, 200, "Token rotated");
     }
     if (!rotated) {
       res.clearCookie("refreshToken", cookieOptions.refreshToken);

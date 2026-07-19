@@ -24,14 +24,14 @@ router
   .post(
     "/",
     authMiddleware.authAccessToken,
-    validate(createTaskSchema),
+    validate(createTaskSchema , 'body'),
     taskController.createTask,
   )
   .delete("/:id", authMiddleware.authAccessToken, taskController.deleteTask)
   .patch(
     "/:id",
     authMiddleware.authAccessToken,
-    validate(updateTaskSchema),
+    validate(updateTaskSchema , 'body'),
     taskController.updateTask,
   )
   .get("/:id", authMiddleware.authAccessToken, taskController.getSingleTask)

@@ -22,23 +22,44 @@ let statusField = string("Priority must be string")
 let dueDateField = date().typeError("Invalid date");
 
 let createTaskSchema = object({
-  title : titleField.required('Title is required'),
-  description : descriptionField,
-  priority : priorityField,
-  status : statusField,
-  dueDate : dueDateField.required("dueDate is required"),
+  title: titleField.required("Title is required"),
+  description: descriptionField,
+  priority: priorityField,
+  status: statusField,
+  dueDate: dueDateField.required("dueDate is required"),
 });
 
 let updateTaskSchema = object({
-  title : titleField,
-  description : descriptionField,
-  priority : priorityField,
-  status : statusField,
-  dueDate : dueDateField,
+  title: titleField,
+  description: descriptionField,
+  priority: priorityField,
+  status: statusField,
+  dueDate: dueDateField,
 });
 
+let taskParamsSchema = object({
+  id: string("ID must be string")
+    .uuid("Invalid task ID")
+    .required("Task ID is required"),
+});
+
+const taskQuerySchema = object({
+  status: string().oneOf(["pending", "in-progress", "done"], "Invalid status"),
+  priority: string().oneOf(["low", "medium", "high"], "Invalid priority"),
+  q: string().trim().max(100, "Search query too long"),
+  minDueDate: string().matches(
+    /^\d{4}-\d{2}-\d{2}$/,
+    "Invalid date format (YYYY-MM-DD)",
+  ),
+  maxDueDate: string().matches(
+    /^\d{4}-\d{2}-\d{2}$/,
+    "Invalid date format (YYYY-MM-DD)",
+  ),
+});
 
 module.exports = {
-    createTaskSchema,
-    updateTaskSchema
-}
+  createTaskSchema,
+  updateTaskSchema,
+  taskParamsSchema,
+  taskQuerySchema,
+};

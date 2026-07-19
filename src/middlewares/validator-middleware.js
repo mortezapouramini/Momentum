@@ -1,16 +1,16 @@
-const appError = require("../utils/error-util")
+const appError = require("../utils/error-util");
 
-
-const validate = (schema) => async (req, res, next) => {
+const validate = (schema, source) => async (req, res, next) => {
   try {
-    req.body = await schema.validate(req.body, { 
-      abortEarly: false, 
-      stripUnknown: true 
-    })
-    next()
+    let validated = await schema.validate(req[source], {
+      abortEarly: false,
+      stripUnknown: true,
+    });
+    req[source] = validated;
+    next();
   } catch (error) {
-    next(appError(400, error.errors[0]))
+    next(appError(400, error.errors[0]));
   }
-}
+};
 
-module.exports = { validate }
+module.exports = { validate };

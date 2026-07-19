@@ -168,13 +168,13 @@ CREATE TABLE refresh_tokens (
 CREATE TABLE tasks (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title       VARCHAR(255) NOT NULL,
-  description TEXT,
+  title       VARCHAR(50) NOT NULL,
+  description VARCHAR(1000),
   priority    VARCHAR(20) NOT NULL DEFAULT 'low' 
               CHECK(priority IN ('low' , 'medium', 'high')),
   status      VARCHAR(20) NOT NULL DEFAULT 'pending'
               CHECK (status IN ('pending', 'in-progress', 'done')),
-  due_date    TIMESTAMPTZ DEFAULT NULL,
+  due_date    TIMESTAMP,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

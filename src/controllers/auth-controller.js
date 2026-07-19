@@ -26,7 +26,7 @@ const registerUser = async (req, res, next) => {
 /** Verifi Email */
 const verifyEmail = async (req, res, next) => {
   const uuid = req.cookies.uuid;
-  const verifyCode = req.body.code;
+  const verifyCode = req.body.verifyCode;
   const userAgent = req.headers["user-agent"];
   const ipAddress = req.ip;
 

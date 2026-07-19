@@ -15,7 +15,7 @@ const createTaskService = async (taskData, userId) => {
     description: taskData.description ?? null,
     priority: taskData.priority || "low",
     status: taskData.status || "pending",
-    dueDate: taskData.dueDate || null,
+    dueDate: taskData.dueDate,
   };
 
   const task = await insertTask(insertData);

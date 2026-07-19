@@ -1,4 +1,4 @@
-const { pool } = require("../config/db-config");
+const { pool } = require("../../config/db.config");
 
 const findUserByEmail = async (userEmail) => {
   const query = `SELECT * FROM users WHERE email = $1`;
@@ -18,20 +18,8 @@ const createUser = async (userName, userEmail, passwordHash) => {
   return (await pool.query(query, [userName, userEmail, passwordHash])).rows[0];
 };
 
-const createSession = async (
-  tokenHash,
-  userId,
-  expiresAt,
-  userAgent,
-  ipAddress,
-) => {
-  const query = `INSERT INTO refresh_tokens(token_hash , user_id , expires_at, user_agent , ip_address) VALUES($1 , $2 , $3 , $4 , $5)`;
-  await pool.query(query, [tokenHash, userId, expiresAt, userAgent, ipAddress]);
-};
-
 module.exports = {
   findUserByEmail,
   findUserByUserName,
   createUser,
-  createSession,
 };

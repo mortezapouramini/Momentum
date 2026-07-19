@@ -1,8 +1,8 @@
 /** Requirements */
 const jwt = require("jsonwebtoken");
-const { pool } = require("../config/db-config");
 const crypto = require("crypto");
-const { createSession } = require("../repository/auth-repository");
+const { pool } = require("../config/db.config");
+const { createSession } = require("./session.repository");
 
 /** Refresh token failure/state reasons */
 const REASONS = {

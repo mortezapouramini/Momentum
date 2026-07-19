@@ -1,10 +1,10 @@
 /** Requirements */
-const responder = require("../utils/responder");
-const authService = require("../services/auth-service");
-const { tokenService } = require("../services/token-service");
-const ROUTES = require("../constants/routes");
-const { cookieOptions } = require("../config/cookie-config");
-const appError = require("../utils/error-util");
+const responder = require("../../utils/responder");
+const authService = require("./auth.service");
+const { tokenService } = require("../../shared/token.service");
+const ROUTES = require("../../constants/routes");
+const { cookieOptions } = require("../../config/cookie.config");
+const appError = require("../../utils/error.util");
 
 /** Register User */
 const registerUser = async (req, res, next) => {

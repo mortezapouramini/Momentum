@@ -1,4 +1,4 @@
-const appError = require("../utils/error-util");
+const appError = require("../utils/error.util");
 
 const validate = (schema, source) => async (req, res, next) => {
   try {

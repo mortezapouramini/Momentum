@@ -1,4 +1,4 @@
-const { pool } = require("../config/db-config");
+const { pool } = require("../../config/db.config");
 
 const insertTask = async (taskData) => {
   const query = `

@@ -1,5 +1,5 @@
-const appError = require("../utils/error-util");
-const { tokenService } = require("../services/token-service");
+const appError = require("../utils/error.util");
+const { tokenService } = require("../shared/token.service");
 
 const authAccessToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];

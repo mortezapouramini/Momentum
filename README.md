@@ -21,12 +21,12 @@ A backend REST API for personal task management, built with Node.js and Express.
 src/
 ├── config/         # Database, Redis, email, and cookie configuration
 ├── constants/      # Shared constants (route paths)
-├── controllers/    # Request handling and response formatting
-├── middlewares/    # Auth middleware and error handler
+├── middlewares/    # Auth middleware, error handler, and validator
+├── modules/
+│   ├── auth/       # Auth routes, controller, service, repository, schema
+│   └── tasks/      # Task routes, controller, service, repository, schema
 ├── queues/         # BullMQ email queue
-├── repository/     # Direct database queries (no business logic)
-├── routes/         # Route definitions
-├── services/       # Business logic only
+├── shared/         # token-service and session-repository (cross-module)
 ├── utils/          # AppError and responder helpers
 └── workers/        # BullMQ email worker
 ```

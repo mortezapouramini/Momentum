@@ -1,5 +1,5 @@
-const responder = require("../utils/responder");
-const taskService = require("../services/task-service");
+const responder = require("../../utils/responder");
+const taskService = require("./task.service");
 
 const createTask = async (req, res, next) => {
   try {

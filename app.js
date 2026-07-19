@@ -2,9 +2,9 @@
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const errorResponder = require("./src/middlewares/error-responder");
-const authRoutes = require('./src/routes/auth-routes')
-const taskRoutes = require('./src/routes/task-routes')
+const errorResponder = require("./src/middlewares/error.responder");
+const authRoutes = require('./src/modules/auth/auth.routes')
+const taskRoutes = require('./src/modules/tasks/task.routes')
 
 /** App */
 const app = express();

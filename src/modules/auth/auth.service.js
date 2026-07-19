@@ -1,16 +1,16 @@
 /** Requirements */
-const appError = require("../utils/error-util");
+const appError = require("../../utils/error.util");
 const crypto = require("crypto");
-const { redis } = require("../config/redis-config");
-const { emailQueue } = require("../queues/email-queue");
 const argon2 = require("argon2");
-const { tokenService } = require("./token-service");
-const ROUTES = require("../constants/routes");
+const { redis } = require("../../config/redis.config");
+const { emailQueue } = require("../../queues/email.queue");
+const { tokenService } = require("../../shared/token.service");
+const ROUTES = require("../../constants/routes");
 const {
   findUserByEmail,
   findUserByUserName,
   createUser,
-} = require("../repository/auth-repository");
+} = require("./auth.repository");
 
 /** Register Service */
 const registerService = async (data) => {
@@ -98,7 +98,6 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
 
 /** Log In Service */
 const loginService = async (data, userAgent, ipAddress) => {
-
   let user;
   if (data.email) {
     user = await findUserByEmail(data.email);

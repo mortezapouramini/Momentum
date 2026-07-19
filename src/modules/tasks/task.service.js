@@ -5,8 +5,8 @@ const {
   getTaskById,
   getTasksByUserId,
   getTasksByFilters,
-} = require("../repository/task-repository");
-const appError = require("../utils/error-util");
+} = require("./task.repository");
+const appError = require("../../utils/error.util");
 
 const createTaskService = async (taskData, userId) => {
   const insertData = {

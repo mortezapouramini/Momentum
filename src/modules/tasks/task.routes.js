@@ -6,32 +6,21 @@ const { validate } = require("../../middlewares/validator.middleware");
 const {
   createTaskSchema,
   updateTaskSchema,
-  taskParamsSchema,
   taskQuerySchema,
 } = require("../tasks/task.schema");
-const appError = require("../../utils/error.util");
-
-router.param("id", async (req, res, next, id) => {
-  try {
-    validate(taskParamsSchema, "params");
-    next();
-  } catch (error) {
-    next(appError(400, "Invalid task ID"));
-  }
-});
 
 router
   .post(
     "/",
     authMiddleware.authAccessToken,
-    validate(createTaskSchema , 'body'),
+    validate(createTaskSchema, "body"),
     taskController.createTask,
   )
   .delete("/:id", authMiddleware.authAccessToken, taskController.deleteTask)
   .patch(
     "/:id",
     authMiddleware.authAccessToken,
-    validate(updateTaskSchema , 'body'),
+    validate(updateTaskSchema, "body"),
     taskController.updateTask,
   )
   .get("/:id", authMiddleware.authAccessToken, taskController.getSingleTask)

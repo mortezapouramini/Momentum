@@ -54,6 +54,5 @@ const taskQuerySchema = object({
 module.exports = {
   createTaskSchema,
   updateTaskSchema,
-  taskParamsSchema,
   taskQuerySchema,
 };

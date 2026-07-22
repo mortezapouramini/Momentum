@@ -9,6 +9,11 @@ let createCommentSchema = object({
     .required("Task ID is required"),
 });
 
+const idParamSchema = object({
+  id: string("ID must be string").uuid("Invalid ID").required("ID is required"),
+});
+
 module.exports = {
   createCommentSchema,
+  idParamSchema
 };

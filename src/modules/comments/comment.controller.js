@@ -14,6 +14,19 @@ const createComment = async (req, res, next) => {
   }
 };
 
+const deleteComment = async (req, res, next) => {
+  try {
+    const deleted = await commentService.deleteCommentService(
+      req.params.id,
+      req.user.sub,
+    );
+    responder(res, deleted.id, null, 200, "Comment deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createComment,
+  deleteComment,
 };

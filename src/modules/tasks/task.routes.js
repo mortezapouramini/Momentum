@@ -7,6 +7,7 @@ const {
   createTaskSchema,
   updateTaskSchema,
   taskQuerySchema,
+  idParamSchema,
 } = require("../tasks/task.schema");
 
 router
@@ -16,14 +17,25 @@ router
     validate(createTaskSchema, "body"),
     taskController.createTask,
   )
-  .delete("/:id", authMiddleware.authAccessToken, taskController.deleteTask)
+  .delete(
+    "/:id",
+    authMiddleware.authAccessToken,
+    validate(idParamSchema, "params"),
+    taskController.deleteTask,
+  )
   .patch(
     "/:id",
     authMiddleware.authAccessToken,
+    validate(idParamSchema, "params"),
     validate(updateTaskSchema, "body"),
     taskController.updateTask,
   )
-  .get("/:id", authMiddleware.authAccessToken, taskController.getSingleTask)
+  .get(
+    "/:id",
+    authMiddleware.authAccessToken,
+    validate(idParamSchema, "params"),
+    taskController.getSingleTask,
+  )
   .get(
     "/",
     authMiddleware.authAccessToken,

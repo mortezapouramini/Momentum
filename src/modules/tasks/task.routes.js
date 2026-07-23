@@ -3,7 +3,7 @@ const router = require("express").Router();
 const authMiddleware = require("../../middlewares/auth.middleware");
 const taskController = require("./task.controller");
 const { validate } = require("../../middlewares/validator.middleware");
-const commentRoutes = require("../comments/comment.routes");
+const noteRoutes = require("../notes/note.routes");
 const {
   createTaskSchema,
   updateTaskSchema,
@@ -45,10 +45,10 @@ router
   );
 
 router.use(
-  "/:taskId/comments",
+  "/:taskId/notes",
   authMiddleware.authAccessToken,
   validate(taskIdParamSchema, "params"),
-  commentRoutes,
+  noteRoutes,
 );
 
 module.exports = router;

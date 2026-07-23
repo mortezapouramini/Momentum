@@ -37,12 +37,6 @@ let updateTaskSchema = object({
   dueDate: dueDateField,
 });
 
-let taskParamsSchema = object({
-  id: string("ID must be string")
-    .uuid("Invalid task ID")
-    .required("Task ID is required"),
-});
-
 const taskQuerySchema = object({
   status: string().oneOf(["pending", "in-progress", "done"], "Invalid status"),
   priority: string().oneOf(["low", "medium", "high"], "Invalid priority"),
@@ -56,10 +50,13 @@ const taskQuerySchema = object({
     "Invalid date format (YYYY-MM-DD)",
   ),
 });
+const taskIdParamSchema = object({
+  taskId: string("ID must be string").uuid("Invalid ID").required("ID is required"),
+});
 
 module.exports = {
   createTaskSchema,
   updateTaskSchema,
-  taskParamsSchema,
   taskQuerySchema,
+  taskIdParamSchema
 };

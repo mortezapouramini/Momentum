@@ -3,43 +3,52 @@ const router = require("express").Router();
 const authMiddleware = require("../../middlewares/auth.middleware");
 const taskController = require("./task.controller");
 const { validate } = require("../../middlewares/validator.middleware");
+const noteRoutes = require("../notes/note.routes");
 const {
   createTaskSchema,
   updateTaskSchema,
-  taskParamsSchema,
   taskQuerySchema,
+  taskIdParamSchema,
 } = require("../tasks/task.schema");
-const appError = require("../../utils/error.util");
-
-router.param("id", async (req, res, next, id) => {
-  try {
-    validate(taskParamsSchema, "params");
-    next();
-  } catch (error) {
-    next(appError(400, "Invalid task ID"));
-  }
-});
 
 router
   .post(
     "/",
     authMiddleware.authAccessToken,
-    validate(createTaskSchema , 'body'),
+    validate(createTaskSchema, "body"),
     taskController.createTask,
   )
-  .delete("/:id", authMiddleware.authAccessToken, taskController.deleteTask)
-  .patch(
-    "/:id",
+  .delete(
+    "/:taskId",
     authMiddleware.authAccessToken,
-    validate(updateTaskSchema , 'body'),
+    validate(taskIdParamSchema, "params"),
+    taskController.deleteTask,
+  )
+  .patch(
+    "/:taskId",
+    authMiddleware.authAccessToken,
+    validate(taskIdParamSchema, "params"),
+    validate(updateTaskSchema, "body"),
     taskController.updateTask,
   )
-  .get("/:id", authMiddleware.authAccessToken, taskController.getSingleTask)
+  .get(
+    "/:taskId",
+    authMiddleware.authAccessToken,
+    validate(taskIdParamSchema, "params"),
+    taskController.getSingleTask,
+  )
   .get(
     "/",
     authMiddleware.authAccessToken,
     validate(taskQuerySchema, "query"),
     taskController.getTasks,
   );
+
+router.use(
+  "/:taskId/notes",
+  authMiddleware.authAccessToken,
+  validate(taskIdParamSchema, "params"),
+  noteRoutes,
+);
 
 module.exports = router;

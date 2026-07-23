@@ -3,11 +3,12 @@ const router = require("express").Router();
 const authMiddleware = require("../../middlewares/auth.middleware");
 const taskController = require("./task.controller");
 const { validate } = require("../../middlewares/validator.middleware");
+const commentRoutes = require("../comments/comment.routes");
 const {
   createTaskSchema,
   updateTaskSchema,
   taskQuerySchema,
-  idParamSchema,
+  taskIdParamSchema,
 } = require("../tasks/task.schema");
 
 router
@@ -18,22 +19,22 @@ router
     taskController.createTask,
   )
   .delete(
-    "/:id",
+    "/:taskId",
     authMiddleware.authAccessToken,
-    validate(idParamSchema, "params"),
+    validate(taskIdParamSchema, "params"),
     taskController.deleteTask,
   )
   .patch(
-    "/:id",
+    "/:taskId",
     authMiddleware.authAccessToken,
-    validate(idParamSchema, "params"),
+    validate(taskIdParamSchema, "params"),
     validate(updateTaskSchema, "body"),
     taskController.updateTask,
   )
   .get(
-    "/:id",
+    "/:taskId",
     authMiddleware.authAccessToken,
-    validate(idParamSchema, "params"),
+    validate(taskIdParamSchema, "params"),
     taskController.getSingleTask,
   )
   .get(
@@ -42,5 +43,12 @@ router
     validate(taskQuerySchema, "query"),
     taskController.getTasks,
   );
+
+router.use(
+  "/:taskId/comments",
+  authMiddleware.authAccessToken,
+  validate(taskIdParamSchema, "params"),
+  commentRoutes,
+);
 
 module.exports = router;

@@ -16,13 +16,13 @@ const insertComment = async (commentData) => {
   ).rows[0];
 };
 
-const deleteCommentById = async (commentId, userId) => {
+const deleteCommentById = async (commentId, taskId, userId) => {
   const query = `
     DELETE FROM comments
-    WHERE id = $1 AND user_id = $2
+    WHERE id = $1 AND task_id = $2 AND user_id = $3
     RETURNING*
   `;
-  return (await pool.query(query, [commentId, userId])).rows[0];
+  return (await pool.query(query, [commentId, taskId, userId])).rows[0];
 };
 
 module.exports = { insertComment, deleteCommentById };

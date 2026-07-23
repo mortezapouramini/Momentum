@@ -1,20 +1,20 @@
-const router = require("express").Router();
-const authMiddleware = require("../../middlewares/auth.middleware");
+const router = require("express").Router({ mergeParams: true });
 const commentController = require("./comment.controller");
 const { validate } = require("../../middlewares/validator.middleware");
-const { createCommentSchema, idParamSchema } = require("./commentSchema");
+const {
+  createCommentSchema,
+  commentIdParamSchema,
+} = require("./commentSchema");
 
 router
   .post(
     "/",
-    authMiddleware.authAccessToken,
     validate(createCommentSchema, "body"),
     commentController.createComment,
   )
   .delete(
-    "/:id",
-    authMiddleware.authAccessToken,
-    validate(idParamSchema, "params"),
+    "/:commentId",
+    validate(commentIdParamSchema, "params"),
     commentController.deleteComment,
   );
 

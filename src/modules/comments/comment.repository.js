@@ -25,4 +25,12 @@ const deleteCommentById = async (commentId, taskId, userId) => {
   return (await pool.query(query, [commentId, taskId, userId])).rows[0];
 };
 
-module.exports = { insertComment, deleteCommentById };
+const getCommentsByTaskId = async (taskId, userId) => {
+  const query = `
+    SELECT * FROM comments
+    WHERE task_id = $1 AND user_id = $2
+  `;
+  return (await pool.query(query, [taskId, userId])).rows;
+};
+
+module.exports = { insertComment, deleteCommentById, getCommentsByTaskId };

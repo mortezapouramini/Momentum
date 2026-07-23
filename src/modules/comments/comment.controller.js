@@ -28,7 +28,20 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
+const getTaskComments = async (req, res, next) => {
+  try {
+    const comments = await commentService.getTaskCommentsService(
+      req.params.taskId,
+      req.user.sub,
+    );
+    responder(res, comments, null, 200, "Comments recived");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createComment,
   deleteComment,
+  getTaskComments
 };

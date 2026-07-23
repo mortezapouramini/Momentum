@@ -1,7 +1,11 @@
 const appError = require("../../utils/error.util");
-const { insertComment, deleteCommentById } = require("./comment.repository");
+const {
+  insertComment,
+  deleteCommentById,
+  getCommentsByTaskId,
+} = require("./comment.repository");
 
-const createCommentService = async (data, taskId ,userId) => {
+const createCommentService = async (data, taskId, userId) => {
   const commentData = { content: data.content, taskId, userId };
   const comment = await insertComment(commentData);
   if (!comment) {
@@ -10,15 +14,20 @@ const createCommentService = async (data, taskId ,userId) => {
   return comment;
 };
 
-const deleteCommentService = async (commentId, taskId , userId) => {
-  const deleted = await deleteCommentById(commentId, taskId , userId);
+const deleteCommentService = async (commentId, taskId, userId) => {
+  const deleted = await deleteCommentById(commentId, taskId, userId);
   if (!deleted) {
     throw appError(404, "Comment not found");
   }
   return deleted;
 };
 
+const getTaskCommentsService = async (taskId, userId) => {
+  return await getCommentsByTaskId(taskId, userId);
+};
+
 module.exports = {
   createCommentService,
   deleteCommentService,
+  getTaskCommentsService
 };

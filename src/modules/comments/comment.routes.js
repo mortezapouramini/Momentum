@@ -16,6 +16,7 @@ router
     "/:commentId",
     validate(commentIdParamSchema, "params"),
     commentController.deleteComment,
-  );
+  )
+  .get("/", commentController.getTaskComments);
 
 module.exports = router;

@@ -33,4 +33,18 @@ const getNotesByTaskId = async (taskId, userId) => {
   return (await pool.query(query, [taskId, userId])).rows;
 };
 
-module.exports = { insertNote, deleteNoteById, getNotesByTaskId };
+const updateNoteById = async (content, noteId, taskId, userId) => {
+  const query = `
+    UPDATE notes
+    SET content = $1
+    WHERE id = $2 AND task_id = $3 AND user_id = $4 RETURNING *
+  `;
+  return (await pool.query(query, [content, noteId, taskId, userId])).rows[0];
+};
+
+module.exports = {
+  insertNote,
+  deleteNoteById,
+  getNotesByTaskId,
+  updateNoteById,
+};

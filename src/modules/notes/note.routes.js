@@ -10,6 +10,12 @@ router
     validate(NoteIdParamSchema, "params"),
     noteController.deleteNote,
   )
-  .get("/", noteController.getTaskNotes);
+  .get("/", noteController.getTaskNotes)
+  .patch(
+    "/:noteId",
+    validate(NoteIdParamSchema, "params"),
+    validate(createNoteSchema, "body"),
+    noteController.updateNote,
+  );
 
 module.exports = router;

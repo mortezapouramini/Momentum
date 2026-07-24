@@ -42,8 +42,23 @@ const getTaskNotes = async (req, res, next) => {
   }
 };
 
+const updateNote = async (req, res, next) => {
+  try {
+    const updated = await noteService.updateNoteService(
+      req.body.content,
+      req.params.noteId,
+      req.params.taskId,
+      req.user.sub,
+    );
+    responder(res, updated, null, 200, "Note updated");
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createNote,
   deleteNote,
   getTaskNotes,
+  updateNote,
 };

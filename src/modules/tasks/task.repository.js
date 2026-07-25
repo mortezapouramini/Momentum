@@ -96,8 +96,8 @@ const getTasksByUserId = async (userId) => {
   ORDER BY created_at DESC
 `;
 
-return (await pool.query(query, [userId])).rows;
-}
+  return (await pool.query(query, [userId])).rows;
+};
 
 module.exports = {
   insertTask,
@@ -105,5 +105,5 @@ module.exports = {
   updateTaskById,
   getTaskById,
   getTasksByFilters,
-  getTasksByUserId
+  getTasksByUserId,
 };

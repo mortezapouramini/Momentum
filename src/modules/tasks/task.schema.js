@@ -50,13 +50,9 @@ const taskQuerySchema = object({
     "Invalid date format (YYYY-MM-DD)",
   ),
 });
-const taskIdParamSchema = object({
-  taskId: string("ID must be string").uuid("Invalid ID").required("ID is required"),
-});
 
 module.exports = {
   createTaskSchema,
   updateTaskSchema,
-  taskQuerySchema,
-  taskIdParamSchema
+  taskQuerySchema
 };

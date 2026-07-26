@@ -3,10 +3,10 @@ const { validate } = require("../../middlewares/validator.middleware");
 const authMiddleware = require("../../middlewares/auth.middleware");
 const categoryController = require("./category.controller");
 const {
-  categoryIdParamSchema,
   createCategorySchema,
   updateCategorySchema,
 } = require("./category.schema");
+const { uuidParamSchema } = require("../../shared/param.schema");
 
 router
   .post(
@@ -18,14 +18,14 @@ router
   .delete(
     "/:categoryId",
     authMiddleware.authAccessToken,
-    validate(categoryIdParamSchema, "params"),
+    validate(uuidParamSchema("categoryId"), "params"),
     categoryController.deleteCategory,
   )
   .get("/", authMiddleware.authAccessToken, categoryController.getCategories)
   .patch(
     "/:categoryId",
     authMiddleware.authAccessToken,
-    validate(categoryIdParamSchema, "params"),
+    validate(uuidParamSchema("categoryId"), "params"),
     validate(updateCategorySchema, "body"),
     categoryController.updateCategory,
   );

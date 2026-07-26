@@ -20,14 +20,7 @@ const updateCategorySchema = object({
   color: colorField,
 });
 
-const categoryIdParamSchema = object({
-  categoryId: string("ID must be string")
-    .uuid("Invalid ID")
-    .required("ID is required"),
-});
-
 module.exports = {
-  categoryIdParamSchema,
   createCategorySchema,
   updateCategorySchema,
 };

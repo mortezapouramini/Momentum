@@ -11,18 +11,24 @@ const {
 const appError = require("../../utils/error.util");
 
 const createTaskService = async (taskData, userId) => {
-  const insertData = {
-    userId,
-    title: taskData.title,
-    description: taskData.description ?? null,
-    priority: taskData.priority || "low",
-    status: taskData.status || "pending",
-    dueDate: taskData.dueDate,
-  };
+  try {
+    const insertData = {
+      userId,
+      title: taskData.title,
+      description: taskData.description ?? null,
+      priority: taskData.priority || "low",
+      status: taskData.status || "pending",
+      dueDate: taskData.dueDate,
+      categoryIds: taskData.categoryIds || [],
+    };
 
-  const task = await insertTask(insertData);
-
-  return task;
+    return await insertTask(insertData);
+  } catch (error) {
+    if (error.message === "INVALID_CATEGORIES") {
+      throw appError(404, "One or more categories not found");
+    }
+    throw error;
+  }
 };
 
 const deleteTaskService = async (taskId, userId) => {
@@ -83,11 +89,7 @@ const addCategoryToTaskService = async (taskId, categoryId, userId) => {
   }
 };
 const deleteCategoryFromTaskService = async (taskId, categoryId, userId) => {
-  const result = await deleteCategoryFromTaskById(
-    taskId,
-    categoryId,
-    userId,
-  );
+  const result = await deleteCategoryFromTaskById(taskId, categoryId, userId);
   if (!result) {
     throw appError(404, "Task or category not found");
   }

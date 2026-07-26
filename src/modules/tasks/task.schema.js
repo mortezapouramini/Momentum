@@ -1,4 +1,4 @@
-const { object, string, number, date } = require("yup");
+const { object, string, number, date, array } = require("yup");
 
 let titleField = string("Title must be string")
   .trim()
@@ -27,6 +27,10 @@ let createTaskSchema = object({
   priority: priorityField,
   status: statusField,
   dueDate: dueDateField.required("dueDate is required"),
+  categoryIds: array()
+    .of(string().uuid("Each category must be a valid UUID"))
+    .optional()
+    .default([]),
 });
 
 let updateTaskSchema = object({
@@ -54,5 +58,5 @@ const taskQuerySchema = object({
 module.exports = {
   createTaskSchema,
   updateTaskSchema,
-  taskQuerySchema
+  taskQuerySchema,
 };

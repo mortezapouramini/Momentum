@@ -99,6 +99,32 @@ const getTasksByUserId = async (userId) => {
   return (await pool.query(query, [userId])).rows;
 };
 
+const insertCategoryToTaskById = async (taskId, categoryId, userId) => {
+  const query = `
+    INSERT INTO task_categories (task_id, category_id)
+    SELECT $1, $2
+    FROM tasks t
+    JOIN categories c ON c.id = $2
+    WHERE t.id = $1 AND t.user_id = $3
+    AND c.user_id = $3
+    RETURNING *
+  `;
+  return (await pool.query(query, [taskId, categoryId, userId])).rows[0];
+};
+
+const deleteCategoryFromTaskById = async (taskId, categoryId, userId) => {
+  const query = `
+    DELETE FROM task_categories tc
+    USING tasks t, categories c
+    WHERE tc.task_id = $1 
+    AND tc.category_id = $2
+    AND t.id = $1 AND t.user_id = $3
+    AND c.id = $2 AND c.user_id = $3
+    RETURNING tc.*
+  `;
+  return (await pool.query(query, [taskId, categoryId, userId])).rows[0];
+};
+
 module.exports = {
   insertTask,
   deleteTaskById,
@@ -106,4 +132,6 @@ module.exports = {
   getTaskById,
   getTasksByFilters,
   getTasksByUserId,
+  insertCategoryToTaskById,
+  deleteCategoryFromTaskById,
 };

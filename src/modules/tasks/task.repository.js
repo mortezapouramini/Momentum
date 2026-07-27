@@ -1,43 +1,61 @@
 const { pool } = require("../../config/db.config");
 
+const validateCategoriesExists = async (categoryIds, client, userId) => {
+  const check = await client.query(
+    `SELECT COUNT(*) FROM categories 
+     WHERE id = ANY($1::uuid[]) AND user_id = $2`,
+    [categoryIds, userId],
+  );
+  if (parseInt(check.rows[0].count) !== categoryIds.length) {
+    throw new Error("INVALID_CATEGORIES");
+  }
+  return true;
+};
+
+const linkCategoriesToTask = async (categoryIds, client, taskId) => {
+  const placeholders = categoryIds.map((_, i) => `($1, $${i + 2})`).join(", ");
+  await client.query(
+    `INSERT INTO task_categories (task_id, category_id) VALUES ${placeholders}`,
+    [taskId, ...categoryIds],
+  );
+};
+
+const insertTaskRow = async (client, taskData) => {
+  return (
+    await client.query(
+      `INSERT INTO tasks (user_id, title, description, priority, status, due_date)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [
+        taskData.userId,
+        taskData.title,
+        taskData.description,
+        taskData.priority,
+        taskData.status,
+        taskData.dueDate,
+      ],
+    )
+  ).rows[0];
+};
+
 const insertTask = async (taskData) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
 
-    const task = (
-      await client.query(
-        `INSERT INTO tasks (user_id, title, description, priority, status, due_date)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [
-          taskData.userId,
-          taskData.title,
-          taskData.description,
-          taskData.priority,
-          taskData.status,
-          taskData.dueDate,
-        ],
-      )
-    ).rows[0];
-
     const categoryIds = taskData.categoryIds;
+    let categoriesExists;
     if (categoryIds.length > 0) {
-      const check = await client.query(
-        `SELECT COUNT(*) FROM categories 
-         WHERE id = ANY($1::uuid[]) AND user_id = $2`,
-        [categoryIds, taskData.userId],
+      categoriesExists = await validateCategoriesExists(
+        categoryIds,
+        client,
+        taskData.userId,
       );
-      if (parseInt(check.rows[0].count) !== categoryIds.length) {
-        throw new Error("INVALID_CATEGORIES");
-      }
+    }
 
-      const placeholders = categoryIds
-        .map((_, i) => `($1, $${i + 2})`)
-        .join(", ");
-      await client.query(
-        `INSERT INTO task_categories (task_id, category_id) VALUES ${placeholders}`,
-        [task.id, ...categoryIds],
-      );
+    const task = await insertTaskRow(client, taskData);
+
+    if (categoriesExists) {
+      await linkCategoriesToTask(categoryIds, client, task.id);
     }
 
     await client.query("COMMIT");

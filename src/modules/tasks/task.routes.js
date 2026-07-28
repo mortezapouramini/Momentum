@@ -10,6 +10,7 @@ const {
   taskQuerySchema,
   taskIdParamSchema,
 } = require("../tasks/task.schema");
+const { uuidParamSchema } = require("../../shared/param.schema");
 
 router
   .post(
@@ -21,20 +22,20 @@ router
   .delete(
     "/:taskId",
     authMiddleware.authAccessToken,
-    validate(taskIdParamSchema, "params"),
+    validate(uuidParamSchema("taskId"), "params"),
     taskController.deleteTask,
   )
   .patch(
     "/:taskId",
     authMiddleware.authAccessToken,
-    validate(taskIdParamSchema, "params"),
+    validate(uuidParamSchema("taskId"), "params"),
     validate(updateTaskSchema, "body"),
     taskController.updateTask,
   )
   .get(
     "/:taskId",
     authMiddleware.authAccessToken,
-    validate(taskIdParamSchema, "params"),
+    validate(uuidParamSchema("taskId"), "params"),
     taskController.getSingleTask,
   )
   .get(
@@ -42,12 +43,26 @@ router
     authMiddleware.authAccessToken,
     validate(taskQuerySchema, "query"),
     taskController.getTasks,
+  )
+  .post(
+    "/:taskId/categories/:categoryId",
+    authMiddleware.authAccessToken,
+    validate(uuidParamSchema("taskId"), "params"),
+    validate(uuidParamSchema("categoryId"), "params"),
+    taskController.addCategoryToTask,
+  )
+  .delete(
+    "/:taskId/categories/:categoryId",
+    authMiddleware.authAccessToken,
+    validate(uuidParamSchema("taskId"), "params"),
+    validate(uuidParamSchema("categoryId"), "params"),
+    taskController.deleteCategoryFromTask,
   );
 
 router.use(
   "/:taskId/notes",
   authMiddleware.authAccessToken,
-  validate(taskIdParamSchema, "params"),
+  validate(uuidParamSchema("taskId"), "params"),
   noteRoutes,
 );
 

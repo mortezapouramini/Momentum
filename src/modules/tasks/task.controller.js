@@ -47,15 +47,46 @@ const getSingleTask = async (req, res, next) => {
   }
 };
 
-
-const getTasks = async (req , res , next) => {
+const getTasks = async (req, res, next) => {
   try {
-    const tasks = await taskService.getTasksService(req.user.sub , req.query)
-    responder(res , tasks , null , 200 , 'Tasks recived')
+    const tasks = await taskService.getTasksService(req.user.sub, req.query);
+    responder(res, tasks, null, 200, "Tasks recived");
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
+const addCategoryToTask = async (req, res, next) => {
+  try {
+    const result = await taskService.addCategoryToTaskService(
+      req.params.taskId,
+      req.params.categoryId,
+      req.user.sub,
+    );
+    responder(res, result, null, 200, "Category added");
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteCategoryFromTask = async (req, res, next) => {
+  try {
+    const result = await taskService.deleteCategoryFromTaskService(
+      req.params.taskId,
+      req.params.categoryId,
+      req.user.sub,
+    );
+    responder(res, result, null, 200, "Category deleted");
+  } catch (error) {
+    next(error);
+  }
+};
 
-module.exports = { createTask, deleteTask, updateTask, getSingleTask , getTasks };
+module.exports = {
+  createTask,
+  deleteTask,
+  updateTask,
+  getSingleTask,
+  getTasks,
+  addCategoryToTask,
+  deleteCategoryFromTask,
+};

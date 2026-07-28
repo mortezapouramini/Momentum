@@ -6,13 +6,6 @@ let createNoteSchema = object({
     .required("Note is required"),
 });
 
-const NoteIdParamSchema = object({
-  noteId: string("ID must be string")
-    .uuid("Invalid ID")
-    .required("ID is required"),
-});
-
 module.exports = {
   createNoteSchema,
-  NoteIdParamSchema,
 };

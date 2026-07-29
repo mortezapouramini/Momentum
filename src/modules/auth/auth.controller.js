@@ -11,13 +11,11 @@ const registerUser = async (req, res, next) => {
   try {
     const uuid = await authService.registerService(req.body);
     res.cookie("uuid", uuid, cookieOptions.uuid);
-    responder(
+    responder({
       res,
-      null,
-      { redirect: ROUTES.AUTH.VERIFY_EMAIL },
-      200,
-      `We've sent a verification code to ${req.body.email}`,
-    );
+      details: { redirect: ROUTES.AUTH.VERIFY_EMAIL },
+      message: `We've sent a verification code to ${req.body.email}`,
+    });
   } catch (error) {
     next(error);
   }
@@ -32,18 +30,23 @@ const verifyEmail = async (req, res, next) => {
 
   try {
     const { user, accessJwt, refreshToken } =
-      await authService.verifyEmailService(
+      await authService.verifyEmailService({
         uuid,
         verifyCode,
         userAgent,
         ipAddress,
-      );
+      });
     res.clearCookie("uuid", cookieOptions.uuid);
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
-    responder(res, user, null, 201, "registeration successful");
+    responder({
+      res,
+      data: user,
+      code: 201,
+      message: "registeration successful",
+    });
   } catch (error) {
-    if(error.code === 429 || error.code === 404){
+    if (error.code === 429 || error.code === 404) {
       res.clearCookie("uuid", cookieOptions.uuid);
     }
     next(error);
@@ -55,14 +58,14 @@ const loginUser = async (req, res, next) => {
   const userAgent = req.headers["user-agent"];
   const ipAddress = req.ip;
   try {
-    const { user, refreshToken, accessJwt } = await authService.loginService(
-      req.body,
+    const { user, refreshToken, accessJwt } = await authService.loginService({
+      data: req.body,
       userAgent,
       ipAddress,
-    );
+    });
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
-    responder(res, user, null, 200, "Login successful");
+    responder({ res, data: user, message: "Login successful" });
   } catch (error) {
     next(error);
   }
@@ -76,7 +79,7 @@ const logOutUser = async (req, res, next) => {
     res.clearCookie("refreshToken", cookieOptions.refreshToken);
     res.removeHeader("authorization");
 
-    responder(res, null, null, 200, "Logout successful");
+    responder({ res, message: "Logout successful" });
   } catch (error) {
     next(error);
   }
@@ -88,20 +91,28 @@ const getNewRefreshToken = async (req, res, next) => {
   const ipAddress = req.ip;
   const refreshToken = req.cookies.refreshToken;
   try {
-    const { rotated, rawToken, accessToken , user } =
-      await tokenService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+    const { rotated, rawToken, accessToken, user } =
+      await tokenService.rotateRefreshToken({
+        refreshToken,
+        userAgent,
+        ipAddress,
+      });
 
     if (rotated && rawToken) {
       res.cookie("refreshToken", rawToken, cookieOptions.refreshToken);
       res.set("authorization", `bearer ${accessToken}`);
-      return responder(res, user, null, 200, "Token rotated");
+      return responder({ res, data: user, message: "Token rotated" });
     }
     if (!rotated) {
       res.clearCookie("refreshToken", cookieOptions.refreshToken);
       res.removeHeader("authorization");
 
       return next(
-        appError(401, "Please login", { redirect: ROUTES.AUTH.LOGIN }),
+        appError({
+          code: 401,
+          message: "Please login",
+          details: { redirect: ROUTES.AUTH.LOGIN },
+        }),
       );
     }
   } catch (error) {

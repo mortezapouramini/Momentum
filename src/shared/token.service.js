@@ -60,12 +60,12 @@ class TokenService {
   };
 
   /** Create Refresh Session */
-  createRefreshSession = async (userId, userAgent, ipAddress) => {
+  createRefreshSession = async ({ userId, userAgent, ipAddress }) => {
     const rawToken = this.generateRefreshToken();
     const tokenHash = this.hashToken(rawToken);
     const expiresAt = new Date(Date.now() + this.refreshTokenExpiry * 1000);
 
-    await createSession(tokenHash, userId, expiresAt, userAgent, ipAddress);
+    await createSession({ tokenHash, userId, expiresAt, userAgent, ipAddress });
     return { rawToken };
   };
 
@@ -145,7 +145,7 @@ class TokenService {
   };
 
   /** Rotate Refresh Token  */
-  rotateRefreshToken = async (rawToken, userAgent, ipAddress) => {
+  rotateRefreshToken = async ({ rawToken, userAgent, ipAddress }) => {
     const result = await this.verifyRefreshToken(rawToken);
 
     if (!result.valid) {

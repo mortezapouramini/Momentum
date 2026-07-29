@@ -1,5 +1,5 @@
 const { pool } = require("../../config/db.config");
-const insertNote = async (noteData) => {
+const insertNote = async ({ taskId, userId, content }) => {
   const query = `
     INSERT INTO notes (task_id, user_id, content)
     SELECT $1, $2, $3
@@ -7,16 +7,10 @@ const insertNote = async (noteData) => {
     WHERE id = $1 AND user_id = $2
     RETURNING *
     `;
-  return (
-    await pool.query(query, [
-      noteData.taskId,
-      noteData.userId,
-      noteData.content,
-    ])
-  ).rows[0];
+  return (await pool.query(query, [taskId, userId, content])).rows[0];
 };
 
-const deleteNoteById = async (noteId, taskId, userId) => {
+const deleteNoteById = async ({ noteId, taskId, userId }) => {
   const query = `
     DELETE FROM notes
     WHERE id = $1 AND task_id = $2 AND user_id = $3
@@ -33,7 +27,7 @@ const getNotesByTaskId = async (taskId, userId) => {
   return (await pool.query(query, [taskId, userId])).rows;
 };
 
-const updateNoteById = async (content, noteId, taskId, userId) => {
+const updateNoteById = async ({ content, noteId, taskId, userId }) => {
   const query = `
     UPDATE notes
     SET content = $1

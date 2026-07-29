@@ -4,12 +4,12 @@ const noteService = require("./note.service");
 /** Add Note */
 const createNote = async (req, res, next) => {
   try {
-    const note = await noteService.createNoteService(
-      req.body,
-      req.params.taskId,
-      req.user.sub,
-    );
-    responder(res, note, null, 201, "Noted");
+    const note = await noteService.createNoteService({
+      data: req.body,
+      taskId: req.params.taskId,
+      userId: req.user.sub,
+    });
+    responder({ res, data: note, code: 201, message: "Noted added" });
   } catch (error) {
     next(error);
   }
@@ -18,12 +18,12 @@ const createNote = async (req, res, next) => {
 /** Delete Note */
 const deleteNote = async (req, res, next) => {
   try {
-    const deleted = await noteService.deleteNoteService(
-      req.params.noteId,
-      req.params.taskId,
-      req.user.sub,
-    );
-    responder(res, deleted.id, null, 200, "Note deleted");
+    const deleted = await noteService.deleteNoteService({
+      noteId: req.params.noteId,
+      taskId: req.params.taskId,
+      userId: req.user.sub,
+    });
+    responder({ res, data: deleted.id, message: "Note deleted" });
   } catch (error) {
     next(error);
   }
@@ -36,7 +36,7 @@ const getTaskNotes = async (req, res, next) => {
       req.params.taskId,
       req.user.sub,
     );
-    responder(res, notes, null, 200, "Notes recived");
+    responder({ res, data: notes, message: "Notes recived" });
   } catch (error) {
     next(error);
   }
@@ -44,13 +44,13 @@ const getTaskNotes = async (req, res, next) => {
 
 const updateNote = async (req, res, next) => {
   try {
-    const updated = await noteService.updateNoteService(
-      req.body.content,
-      req.params.noteId,
-      req.params.taskId,
-      req.user.sub,
-    );
-    responder(res, updated, null, 200, "Note updated");
+    const updated = await noteService.updateNoteService({
+      content: req.body.content,
+      noteId: req.params.noteId,
+      taskId: req.params.taskId,
+      userId: req.user.sub,
+    });
+    responder({ res, data: updated, message: "Note updated" });
   } catch (error) {
     next(error);
   }

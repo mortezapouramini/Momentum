@@ -16,7 +16,7 @@ const deleteCategoryById = async (categoryId, userId) => {
   return (await pool.query(query, [categoryId, userId])).rows[0];
 };
 
-const updateCategoryById = async (data, categoryId, userId) => {
+const updateCategoryById = async ({data, categoryId, userId}) => {
   let fields = [];
   let values = [];
   let index = 1;

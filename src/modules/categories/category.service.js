@@ -12,19 +12,19 @@ const createCategoryService = async (data, userId) => {
     return category;
   } catch (error) {
     if (error.code === "23505") {
-      throw appError(400, "Category is already exists");
+      throw appError({ code: 400, message: "Category is already exists" });
     }
     throw error;
   }
 };
 
-const updateCategoryService = async ({data, categoryId, userId}) => {
+const updateCategoryService = async ({ data, categoryId, userId }) => {
   try {
-    const updated = await updateCategoryById({data, categoryId, userId});
+    const updated = await updateCategoryById({ data, categoryId, userId });
     return updated;
   } catch (error) {
     if (error.code === "23505") {
-      throw appError(400, "Category is already exists");
+      throw appError({ code: 400, message: "Category is already exists" });
     }
     throw error;
   }
@@ -33,7 +33,7 @@ const updateCategoryService = async ({data, categoryId, userId}) => {
 const deleteCategoryService = async (categoryId, userId) => {
   const deleted = await deleteCategoryById(categoryId, userId);
   if (!deleted) {
-    throw appError(404, "Category not found");
+    throw appError({ code: 404, message: "Category not found" });
   }
   return deleted;
 };

@@ -105,7 +105,11 @@ const getNewRefreshToken = async (req, res, next) => {
       res.removeHeader("authorization");
 
       return next(
-        appError(401, "Please login", { redirect: ROUTES.AUTH.LOGIN }),
+        appError({
+          code: 401,
+          message: "Please login",
+          details: { redirect: ROUTES.AUTH.LOGIN },
+        }),
       );
     }
   } catch (error) {

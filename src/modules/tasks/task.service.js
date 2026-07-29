@@ -25,7 +25,10 @@ const createTaskService = async (taskData, userId) => {
     return await insertTask(insertData);
   } catch (error) {
     if (error.message === "INVALID_CATEGORIES") {
-      throw appError(404, "One or more categories not found");
+      throw appError({
+        code: 404,
+        message: "One or more categories not found",
+      });
     }
     throw error;
   }
@@ -34,7 +37,7 @@ const createTaskService = async (taskData, userId) => {
 const deleteTaskService = async (taskId, userId) => {
   const task = await deleteTaskById(taskId, userId);
   if (!task) {
-    throw appError(404, "Task not found");
+    throw appError({ code: 404, message: "Task not found" });
   }
   return task;
 };
@@ -49,7 +52,7 @@ const updateTaskService = async ({ taskId, taskData, userId }) => {
   };
 
   if (Object.keys(taskData).length === 0) {
-    throw appError(400, "No fields to update");
+    throw appError({ code: 400, message: "No fields to update" });
   }
 
   const task = await updateTaskById({
@@ -59,7 +62,7 @@ const updateTaskService = async ({ taskId, taskData, userId }) => {
     userId,
   });
   if (!task) {
-    throw appError(404, "Task not found");
+    throw appError({ code: 404, message: "Task not found" });
   }
   return task;
 };
@@ -67,7 +70,7 @@ const updateTaskService = async ({ taskId, taskData, userId }) => {
 const getSingleTaskService = async (taskId, userId) => {
   const task = await getTaskById(taskId, userId);
   if (!task) {
-    throw appError(404, "Task not found");
+    throw appError({ code: 404, message: "Task not found" });
   }
   return task;
 };
@@ -87,12 +90,12 @@ const addCategoryToTaskService = async ({ taskId, categoryId, userId }) => {
       userId,
     });
     if (!result) {
-      throw appError(404, "Task or category not found");
+      throw appError({ code: 404, message: "Task or category not found" });
     }
     return result;
   } catch (error) {
     if (error.code === "23505") {
-      throw appError(400, "Task is already in category");
+      throw appError({ code: 400, message: "Task is already in category" });
     }
     throw error;
   }
@@ -108,7 +111,7 @@ const deleteCategoryFromTaskService = async ({
     userId,
   });
   if (!result) {
-    throw appError(404, "Task or category not found");
+    throw appError({ code: 404, message: "Task or category not found" });
   }
   return result;
 };

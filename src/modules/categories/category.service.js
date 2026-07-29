@@ -18,9 +18,9 @@ const createCategoryService = async (data, userId) => {
   }
 };
 
-const updateCategoryService = async (data, categoryId, userId) => {
+const updateCategoryService = async ({data, categoryId, userId}) => {
   try {
-    const updated = await updateCategoryById(data, categoryId, userId);
+    const updated = await updateCategoryById({data, categoryId, userId});
     return updated;
   } catch (error) {
     if (error.code === "23505") {

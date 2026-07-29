@@ -15,11 +15,11 @@ const createCategory = async (req, res, next) => {
 
 const updateCategory = async (req, res, next) => {
   try {
-    const updated = await categoryService.updateCategoryService(
-      req.body,
-      req.params.categoryId,
-      req.user.sub,
-    );
+    const updated = await categoryService.updateCategoryService({
+      data: req.body,
+      categoryId: req.params.categoryId,
+      userId: req.user.sub,
+    });
     responder(res, updated, null, 200, "Category updated");
   } catch (error) {
     next(error);

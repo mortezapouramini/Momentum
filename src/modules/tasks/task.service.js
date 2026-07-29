@@ -39,7 +39,7 @@ const deleteTaskService = async (taskId, userId) => {
   return task;
 };
 
-const updateTaskService = async (taskId, taskData, userId) => {
+const updateTaskService = async ({ taskId, taskData, userId }) => {
   const UPDATABLE_FIELDS = {
     title: "title",
     description: "description",
@@ -52,7 +52,12 @@ const updateTaskService = async (taskId, taskData, userId) => {
     throw appError(400, "No fields to update");
   }
 
-  const task = await updateTaskById(taskData, UPDATABLE_FIELDS, taskId, userId);
+  const task = await updateTaskById({
+    taskData,
+    UPDATABLE_FIELDS,
+    taskId,
+    userId,
+  });
   if (!task) {
     throw appError(404, "Task not found");
   }
@@ -74,9 +79,13 @@ const getTasksService = async (userId, filters) => {
   return await getTasksByFilters(userId, filters);
 };
 
-const addCategoryToTaskService = async (taskId, categoryId, userId) => {
+const addCategoryToTaskService = async ({ taskId, categoryId, userId }) => {
   try {
-    const result = await insertCategoryToTaskById(taskId, categoryId, userId);
+    const result = await insertCategoryToTaskById({
+      taskId,
+      categoryId,
+      userId,
+    });
     if (!result) {
       throw appError(404, "Task or category not found");
     }
@@ -88,8 +97,16 @@ const addCategoryToTaskService = async (taskId, categoryId, userId) => {
     throw error;
   }
 };
-const deleteCategoryFromTaskService = async (taskId, categoryId, userId) => {
-  const result = await deleteCategoryFromTaskById(taskId, categoryId, userId);
+const deleteCategoryFromTaskService = async ({
+  taskId,
+  categoryId,
+  userId,
+}) => {
+  const result = await deleteCategoryFromTaskById({
+    taskId,
+    categoryId,
+    userId,
+  });
   if (!result) {
     throw appError(404, "Task or category not found");
   }

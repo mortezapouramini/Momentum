@@ -24,11 +24,11 @@ const deleteTask = async (req, res, next) => {
 
 const updateTask = async (req, res, next) => {
   try {
-    const updatedTask = await taskService.updateTaskService(
-      req.params.taskId,
-      req.body,
-      req.user.sub,
-    );
+    const updatedTask = await taskService.updateTaskService({
+      taskId: req.params.taskId,
+      taskData: req.body,
+      userId: req.user.sub,
+    });
     responder(res, updatedTask, null, 200, "Task updated");
   } catch (error) {
     next(error);
@@ -58,11 +58,11 @@ const getTasks = async (req, res, next) => {
 
 const addCategoryToTask = async (req, res, next) => {
   try {
-    const result = await taskService.addCategoryToTaskService(
-      req.params.taskId,
-      req.params.categoryId,
-      req.user.sub,
-    );
+    const result = await taskService.addCategoryToTaskService({
+      taskId: req.params.taskId,
+      categoryId: req.params.categoryId,
+      userId: req.user.sub,
+    });
     responder(res, result, null, 200, "Category added");
   } catch (error) {
     next(error);
@@ -70,11 +70,11 @@ const addCategoryToTask = async (req, res, next) => {
 };
 const deleteCategoryFromTask = async (req, res, next) => {
   try {
-    const result = await taskService.deleteCategoryFromTaskService(
-      req.params.taskId,
-      req.params.categoryId,
-      req.user.sub,
-    );
+    const result = await taskService.deleteCategoryFromTaskService({
+      taskId: req.params.taskId,
+      categoryId: req.params.categoryId,
+      userId: req.user.sub,
+    });
     responder(res, result, null, 200, "Category deleted");
   } catch (error) {
     next(error);

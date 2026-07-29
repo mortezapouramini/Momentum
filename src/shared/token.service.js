@@ -145,7 +145,7 @@ class TokenService {
   };
 
   /** Rotate Refresh Token  */
-  rotateRefreshToken = async ({rawToken, userAgent, ipAddress}) => {
+  rotateRefreshToken = async ({ rawToken, userAgent, ipAddress }) => {
     const result = await this.verifyRefreshToken(rawToken);
 
     if (!result.valid) {

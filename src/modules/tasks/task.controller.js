@@ -4,7 +4,7 @@ const taskService = require("./task.service");
 const createTask = async (req, res, next) => {
   try {
     const newTask = await taskService.createTaskService(req.body, req.user.sub);
-    responder(res, newTask, null, 201, "Task created");
+    responder({ res, data: newTask, code: 201, message: "Task created" });
   } catch (error) {
     next(error);
   }
@@ -16,7 +16,7 @@ const deleteTask = async (req, res, next) => {
       req.params.taskId,
       req.user.sub,
     );
-    responder(res, deletedTask, null, 200, "Task deleted");
+    responder({ res, data: deletedTask, message: "Task deleted" });
   } catch (error) {
     next(error);
   }
@@ -29,7 +29,7 @@ const updateTask = async (req, res, next) => {
       taskData: req.body,
       userId: req.user.sub,
     });
-    responder(res, updatedTask, null, 200, "Task updated");
+    responder({ res, data: updatedTask, message: "Task updated" });
   } catch (error) {
     next(error);
   }
@@ -41,7 +41,7 @@ const getSingleTask = async (req, res, next) => {
       req.params.taskId,
       req.user.sub,
     );
-    responder(res, task, null, 200, "Task Recived");
+    responder({ res, data: task, message: "Task Recived" });
   } catch (error) {
     next(error);
   }
@@ -50,7 +50,7 @@ const getSingleTask = async (req, res, next) => {
 const getTasks = async (req, res, next) => {
   try {
     const tasks = await taskService.getTasksService(req.user.sub, req.query);
-    responder(res, tasks, null, 200, "Tasks recived");
+    responder({ res, data: tasks, message: "Tasks recived" });
   } catch (error) {
     next(error);
   }
@@ -63,7 +63,7 @@ const addCategoryToTask = async (req, res, next) => {
       categoryId: req.params.categoryId,
       userId: req.user.sub,
     });
-    responder(res, result, null, 200, "Category added");
+    responder({ res, data: result, message: "Category added" });
   } catch (error) {
     next(error);
   }
@@ -75,7 +75,7 @@ const deleteCategoryFromTask = async (req, res, next) => {
       categoryId: req.params.categoryId,
       userId: req.user.sub,
     });
-    responder(res, result, null, 200, "Category deleted");
+    responder({ res, data: result, message: "Category deleted" });
   } catch (error) {
     next(error);
   }

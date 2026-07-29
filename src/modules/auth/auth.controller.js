@@ -11,13 +11,11 @@ const registerUser = async (req, res, next) => {
   try {
     const uuid = await authService.registerService(req.body);
     res.cookie("uuid", uuid, cookieOptions.uuid);
-    responder(
+    responder({
       res,
-      null,
-      { redirect: ROUTES.AUTH.VERIFY_EMAIL },
-      200,
-      `We've sent a verification code to ${req.body.email}`,
-    );
+      details: { redirect: ROUTES.AUTH.VERIFY_EMAIL },
+      message: `We've sent a verification code to ${req.body.email}`,
+    });
   } catch (error) {
     next(error);
   }
@@ -41,7 +39,12 @@ const verifyEmail = async (req, res, next) => {
     res.clearCookie("uuid", cookieOptions.uuid);
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
-    responder(res, user, null, 201, "registeration successful");
+    responder({
+      res,
+      data: user,
+      code: 201,
+      message: "registeration successful",
+    });
   } catch (error) {
     if (error.code === 429 || error.code === 404) {
       res.clearCookie("uuid", cookieOptions.uuid);
@@ -62,7 +65,7 @@ const loginUser = async (req, res, next) => {
     });
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
-    responder(res, user, null, 200, "Login successful");
+    responder({ res, data: user, message: "Login successful" });
   } catch (error) {
     next(error);
   }
@@ -76,7 +79,7 @@ const logOutUser = async (req, res, next) => {
     res.clearCookie("refreshToken", cookieOptions.refreshToken);
     res.removeHeader("authorization");
 
-    responder(res, null, null, 200, "Logout successful");
+    responder({ res, message: "Logout successful" });
   } catch (error) {
     next(error);
   }
@@ -98,7 +101,7 @@ const getNewRefreshToken = async (req, res, next) => {
     if (rotated && rawToken) {
       res.cookie("refreshToken", rawToken, cookieOptions.refreshToken);
       res.set("authorization", `bearer ${accessToken}`);
-      return responder(res, user, null, 200, "Token rotated");
+      return responder({ res, data: user, message: "Token rotated" });
     }
     if (!rotated) {
       res.clearCookie("refreshToken", cookieOptions.refreshToken);

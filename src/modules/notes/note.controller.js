@@ -9,7 +9,7 @@ const createNote = async (req, res, next) => {
       taskId: req.params.taskId,
       userId: req.user.sub,
     });
-    responder(res, note, null, 201, "Noted");
+    responder({ res, data: note, code: 201, message: "Noted added" });
   } catch (error) {
     next(error);
   }
@@ -23,7 +23,7 @@ const deleteNote = async (req, res, next) => {
       taskId: req.params.taskId,
       userId: req.user.sub,
     });
-    responder(res, deleted.id, null, 200, "Note deleted");
+    responder({ res, data: deleted.id, message: "Note deleted" });
   } catch (error) {
     next(error);
   }
@@ -36,7 +36,7 @@ const getTaskNotes = async (req, res, next) => {
       req.params.taskId,
       req.user.sub,
     );
-    responder(res, notes, null, 200, "Notes recived");
+    responder({ res, data: notes, message: "Notes recived" });
   } catch (error) {
     next(error);
   }
@@ -50,7 +50,7 @@ const updateNote = async (req, res, next) => {
       taskId: req.params.taskId,
       userId: req.user.sub,
     });
-    responder(res, updated, null, 200, "Note updated");
+    responder({ res, data: updated, message: "Note updated" });
   } catch (error) {
     next(error);
   }

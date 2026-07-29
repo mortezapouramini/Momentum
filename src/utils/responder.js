@@ -1,4 +1,4 @@
-const responder = (res, data = null, details = null, code = 200, message = null) => {
+const responder = ({res, data = null, details = null, code = 200, message = null}) => {
   const response = {
     success: true,
     code,

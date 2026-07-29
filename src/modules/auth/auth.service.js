@@ -58,7 +58,12 @@ const registerService = async (data) => {
 };
 
 /** Verify Email Service */
-const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
+const verifyEmailService = async ({
+  uuid,
+  verifyCode,
+  userAgent,
+  ipAddress,
+}) => {
   const pendingUser = await redis.hgetall(`pending:${uuid}`);
   if (Object.keys(pendingUser).length === 0) {
     throw appError(404, "Registeration timeout", {
@@ -78,18 +83,18 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
     throw appError(400, "invalid verification code");
   }
 
-  const user = await createUser(
-    pendingUser.userName,
-    pendingUser.email,
-    pendingUser.passwordHash,
-  );
+  const user = await createUser({
+    userName: pendingUser.userName,
+    userEmail: pendingUser.email,
+    passwordHash: pendingUser.passwordHas,
+  });
 
   const accessJwt = tokenService.generateAccessJwt(user);
-  const { rawToken } = await tokenService.createRefreshSession(
-    user.id,
+  const { rawToken } = await tokenService.createRefreshSession({
+    userId: user.id,
     userAgent,
     ipAddress,
-  );
+  });
 
   await redis.del(`pending:${uuid}`);
   await redis.del(`pending:email:${pendingUser.email}`);
@@ -97,7 +102,7 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
 };
 
 /** Log In Service */
-const loginService = async (data, userAgent, ipAddress) => {
+const loginService = async ({ data, userAgent, ipAddress }) => {
   let user;
   if (data.email) {
     user = await findUserByEmail(data.email);
@@ -118,11 +123,11 @@ const loginService = async (data, userAgent, ipAddress) => {
 
   delete user.password_hash;
   const accessJwt = tokenService.generateAccessJwt(user);
-  const { rawToken } = await tokenService.createRefreshSession(
-    user.id,
+  const { rawToken } = await tokenService.createRefreshSession({
+    userId: user.id,
     userAgent,
     ipAddress,
-  );
+  });
 
   return { user, accessJwt, refreshToken: rawToken };
 };

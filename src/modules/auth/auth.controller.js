@@ -32,18 +32,18 @@ const verifyEmail = async (req, res, next) => {
 
   try {
     const { user, accessJwt, refreshToken } =
-      await authService.verifyEmailService(
+      await authService.verifyEmailService({
         uuid,
         verifyCode,
         userAgent,
         ipAddress,
-      );
+      });
     res.clearCookie("uuid", cookieOptions.uuid);
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 201, "registeration successful");
   } catch (error) {
-    if(error.code === 429 || error.code === 404){
+    if (error.code === 429 || error.code === 404) {
       res.clearCookie("uuid", cookieOptions.uuid);
     }
     next(error);
@@ -55,11 +55,11 @@ const loginUser = async (req, res, next) => {
   const userAgent = req.headers["user-agent"];
   const ipAddress = req.ip;
   try {
-    const { user, refreshToken, accessJwt } = await authService.loginService(
-      req.body,
+    const { user, refreshToken, accessJwt } = await authService.loginService({
+      data: req.body,
       userAgent,
       ipAddress,
-    );
+    });
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder(res, user, null, 200, "Login successful");
@@ -88,8 +88,12 @@ const getNewRefreshToken = async (req, res, next) => {
   const ipAddress = req.ip;
   const refreshToken = req.cookies.refreshToken;
   try {
-    const { rotated, rawToken, accessToken , user } =
-      await tokenService.rotateRefreshToken(refreshToken, userAgent, ipAddress);
+    const { rotated, rawToken, accessToken, user } =
+      await tokenService.rotateRefreshToken({
+        refreshToken,
+        userAgent,
+        ipAddress,
+      });
 
     if (rotated && rawToken) {
       res.cookie("refreshToken", rawToken, cookieOptions.refreshToken);

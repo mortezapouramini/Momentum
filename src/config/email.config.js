@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendMail = async (to, subject, text) => {
+const sendMail = async ({to, subject, text}) => {
   try {
     await transporter.sendMail({
       from: "Momentum",

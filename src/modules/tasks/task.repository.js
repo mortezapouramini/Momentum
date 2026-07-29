@@ -1,6 +1,6 @@
 const { pool } = require("../../config/db.config");
 
-const validateCategoriesExists = async (categoryIds, client, userId) => {
+const validateCategoriesExists = async ({ categoryIds, client, userId }) => {
   const check = await client.query(
     `SELECT COUNT(*) FROM categories 
      WHERE id = ANY($1::uuid[]) AND user_id = $2`,
@@ -12,7 +12,7 @@ const validateCategoriesExists = async (categoryIds, client, userId) => {
   return true;
 };
 
-const linkCategoriesToTask = async (categoryIds, client, taskId) => {
+const linkCategoriesToTask = async ({ categoryIds, client, taskId }) => {
   const placeholders = categoryIds.map((_, i) => `($1, $${i + 2})`).join(", ");
   await client.query(
     `INSERT INTO task_categories (task_id, category_id) VALUES ${placeholders}`,
@@ -55,7 +55,7 @@ const insertTask = async (taskData) => {
     const task = await insertTaskRow(client, taskData);
 
     if (categoriesExists) {
-      await linkCategoriesToTask(categoryIds, client, task.id);
+      await linkCategoriesToTask({ categoryIds, client, taskId: task.id });
     }
 
     await client.query("COMMIT");
@@ -77,7 +77,12 @@ const deleteTaskById = async (taskId, userId) => {
   return (await pool.query(query, [taskId, userId])).rows[0];
 };
 
-const updateTaskById = async (taskData, updatableFields, taskId, userId) => {
+const updateTaskById = async ({
+  taskData,
+  updatableFields,
+  taskId,
+  userId,
+}) => {
   const fields = [];
   const values = [];
   let index = 1;
@@ -148,7 +153,7 @@ const getTasksByUserId = async (userId) => {
   return (await pool.query(query, [userId])).rows;
 };
 
-const insertCategoryToTaskById = async (taskId, categoryId, userId) => {
+const insertCategoryToTaskById = async ({ taskId, categoryId, userId }) => {
   const query = `
     INSERT INTO task_categories (task_id, category_id)
     SELECT $1, $2
@@ -161,7 +166,7 @@ const insertCategoryToTaskById = async (taskId, categoryId, userId) => {
   return (await pool.query(query, [taskId, categoryId, userId])).rows[0];
 };
 
-const deleteCategoryFromTaskById = async (taskId, categoryId, userId) => {
+const deleteCategoryFromTaskById = async ({ taskId, categoryId, userId }) => {
   const query = `
     DELETE FROM task_categories tc
     USING tasks t, categories c

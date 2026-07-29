@@ -10,11 +10,11 @@ const worker = new Worker(
   "email-queue",
   async (job) => {
     const { email, verifyCode } = job.data;
-    await sendMail(
-      email,
-      "Verification code",
-      `Your verification code : \n ${verifyCode}`,
-    );
+    await sendMail({
+      to: email,
+      subject: "Verification code",
+      text: `Your verification code : \n ${verifyCode}`,
+    });
   },
   {
     connection: redis,

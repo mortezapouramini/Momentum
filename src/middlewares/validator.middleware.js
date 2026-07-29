@@ -6,10 +6,10 @@ const validate = (schema, source) => async (req, res, next) => {
       abortEarly: false,
       stripUnknown: true,
     });
-    req[source] = {...req[source] , ...validated};
+    req[source] = { ...req[source], ...validated };
     next();
   } catch (error) {
-    next(appError(400, error.errors[0]));
+    next(appError({ code: 400, message: error.errors[0] }));
   }
 };
 

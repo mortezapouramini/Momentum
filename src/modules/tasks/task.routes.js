@@ -7,8 +7,7 @@ const noteRoutes = require("../notes/note.routes");
 const {
   createTaskSchema,
   updateTaskSchema,
-  taskQuerySchema,
-  taskIdParamSchema,
+  taskQuerySchema
 } = require("../tasks/task.schema");
 const { uuidParamSchema } = require("../../shared/param.schema");
 

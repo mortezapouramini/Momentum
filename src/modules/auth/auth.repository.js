@@ -9,7 +9,7 @@ const findUserByUserName = async (userName) => {
   return (await pool.query(query, [userName])).rows[0];
 };
 
-const createUser = async (userName, userEmail, passwordHash) => {
+const createUser = async ({userName, userEmail, passwordHash}) => {
   const query = `
     INSERT INTO users(user_name , email , password_hash)
     VALUES( $1 , $2 , $3)

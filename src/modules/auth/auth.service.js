@@ -19,7 +19,7 @@ const registerService = async (data) => {
     (await findUserByUserName(data.userName));
 
   if (user) {
-    throw appError(409, "Registration failed");
+    throw appError({ code: 409, message: "Registration failed" });
   }
 
   const existingUUID = await redis.get(`pending:email:${data.email}`);
@@ -58,11 +58,20 @@ const registerService = async (data) => {
 };
 
 /** Verify Email Service */
-const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
+const verifyEmailService = async ({
+  uuid,
+  verifyCode,
+  userAgent,
+  ipAddress,
+}) => {
   const pendingUser = await redis.hgetall(`pending:${uuid}`);
   if (Object.keys(pendingUser).length === 0) {
-    throw appError(404, "Registeration timeout", {
-      redirect: ROUTES.AUTH.REGISTER,
+    throw appError({
+      code: 404,
+      message: "Registeration timeout",
+      details: {
+        redirect: ROUTES.AUTH.REGISTER,
+      },
     });
   }
 
@@ -70,26 +79,30 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
     if (Number(pendingUser.attempts) >= 3) {
       await redis.del(`pending:${uuid}`);
       await redis.del(`pending:email:${pendingUser.email}`);
-      throw appError(429, "Too many requests", {
-        redirect: ROUTES.AUTH.REGISTER,
+      throw appError({
+        code: 429,
+        message: "Too many requests",
+        details: {
+          redirect: ROUTES.AUTH.REGISTER,
+        },
       });
     }
     await redis.hincrby(`pending:${uuid}`, "attempts", 1);
-    throw appError(400, "invalid verification code");
+    throw appError({ code: 400, message: "invalid verification code" });
   }
 
-  const user = await createUser(
-    pendingUser.userName,
-    pendingUser.email,
-    pendingUser.passwordHash,
-  );
+  const user = await createUser({
+    userName: pendingUser.userName,
+    userEmail: pendingUser.email,
+    passwordHash: pendingUser.passwordHas,
+  });
 
   const accessJwt = tokenService.generateAccessJwt(user);
-  const { rawToken } = await tokenService.createRefreshSession(
-    user.id,
+  const { rawToken } = await tokenService.createRefreshSession({
+    userId: user.id,
     userAgent,
     ipAddress,
-  );
+  });
 
   await redis.del(`pending:${uuid}`);
   await redis.del(`pending:email:${pendingUser.email}`);
@@ -97,7 +110,7 @@ const verifyEmailService = async (uuid, verifyCode, userAgent, ipAddress) => {
 };
 
 /** Log In Service */
-const loginService = async (data, userAgent, ipAddress) => {
+const loginService = async ({ data, userAgent, ipAddress }) => {
   let user;
   if (data.email) {
     user = await findUserByEmail(data.email);
@@ -106,23 +119,23 @@ const loginService = async (data, userAgent, ipAddress) => {
   }
 
   if (!user) {
-    throw appError(401, "Invalid credentials");
+    throw appError({ code: 401, message: "Invalid credentials" });
   }
   const isMatchPassword = await argon2.verify(
     user.password_hash,
     data.password,
   );
   if (!isMatchPassword) {
-    throw appError(401, "Invalid credentials");
+    throw appError({ code: 401, message: "Invalid credentials" });
   }
 
   delete user.password_hash;
   const accessJwt = tokenService.generateAccessJwt(user);
-  const { rawToken } = await tokenService.createRefreshSession(
-    user.id,
+  const { rawToken } = await tokenService.createRefreshSession({
+    userId: user.id,
     userAgent,
     ipAddress,
-  );
+  });
 
   return { user, accessJwt, refreshToken: rawToken };
 };

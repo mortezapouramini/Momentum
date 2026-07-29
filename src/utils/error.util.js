@@ -7,7 +7,7 @@ class AppError extends Error {
   }
 }
 
-const appError = (code, message, details = null) => {
+const appError = ({code, message, details = null}) => {
   return new AppError(code, message, details);
 };
 

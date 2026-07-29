@@ -7,7 +7,12 @@ const createCategory = async (req, res, next) => {
       req.body,
       req.user.sub,
     );
-    responder(res, category, null, 201, "New category created");
+    responder({
+      res,
+      data: category,
+      code: 201,
+      message: "New category created",
+    });
   } catch (error) {
     next(error);
   }
@@ -15,12 +20,12 @@ const createCategory = async (req, res, next) => {
 
 const updateCategory = async (req, res, next) => {
   try {
-    const updated = await categoryService.updateCategoryService(
-      req.body,
-      req.params.categoryId,
-      req.user.sub,
-    );
-    responder(res, updated, null, 200, "Category updated");
+    const updated = await categoryService.updateCategoryService({
+      data: req.body,
+      categoryId: req.params.categoryId,
+      userId: req.user.sub,
+    });
+    responder({ res, data: updated, message: "Category updated" });
   } catch (error) {
     next(error);
   }
@@ -32,7 +37,7 @@ const deleteCategory = async (req, res, next) => {
       req.params.categoryId,
       req.user.sub,
     );
-    responder(res, deleted, null, 200, "Category deleted");
+    responder({ res, data: deleted, message: "Category deleted" });
   } catch (error) {
     next(error);
   }
@@ -41,7 +46,11 @@ const deleteCategory = async (req, res, next) => {
 const getCategories = async (req, res, next) => {
   try {
     const categories = await categoryService.getCategoriesService(req.user.sub);
-    responder(res, categories, null, 200, "Categories recived");
+    responder({
+      res,
+      data: categories,
+      message: "Categories recived",
+    });
   } catch (error) {
     next(error);
   }

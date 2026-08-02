@@ -57,7 +57,7 @@ const updateTaskService = async ({ taskId, taskData, userId }) => {
 
   const task = await updateTaskById({
     taskData,
-    UPDATABLE_FIELDS,
+    updatableFields: UPDATABLE_FIELDS,
     taskId,
     userId,
   });

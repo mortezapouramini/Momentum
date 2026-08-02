@@ -93,7 +93,7 @@ const getNewRefreshToken = async (req, res, next) => {
   try {
     const { rotated, rawToken, accessToken, user } =
       await tokenService.rotateRefreshToken({
-        refreshToken,
+        rawToken: refreshToken,
         userAgent,
         ipAddress,
       });

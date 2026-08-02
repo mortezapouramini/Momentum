@@ -29,7 +29,7 @@ const registerService = async (data) => {
 
   const passwordHash = await argon2.hash(data.password);
   const uuid = crypto.randomUUID();
-  const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const verifyCode = 100000 + crypto.randomInt(900000);
 
   const userData = {
     email: data.email,
@@ -94,7 +94,7 @@ const verifyEmailService = async ({
   const user = await createUser({
     userName: pendingUser.userName,
     userEmail: pendingUser.email,
-    passwordHash: pendingUser.passwordHas,
+    passwordHash: pendingUser.passwordHash,
   });
 
   const accessJwt = tokenService.generateAccessJwt(user);

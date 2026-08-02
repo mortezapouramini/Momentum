@@ -45,11 +45,11 @@ const insertTask = async (taskData) => {
     const categoryIds = taskData.categoryIds;
     let categoriesExists;
     if (categoryIds.length > 0) {
-      categoriesExists = await validateCategoriesExists(
+      categoriesExists = await validateCategoriesExists({
         categoryIds,
         client,
-        taskData.userId,
-      );
+        userId: taskData.userId,
+      });
     }
 
     const task = await insertTaskRow(client, taskData);

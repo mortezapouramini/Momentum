@@ -1,4 +1,5 @@
 const { Pool } = require("pg");
+const { logger } = require("./logger.config");
 
 const pool = new Pool({
   database: process.env.DATABASE,
@@ -9,10 +10,10 @@ const pool = new Pool({
 });
 
 pool.on("connect", () => {
-  console.log(`Database ${process.env.DATABASE} connected`);
+  logger.info(`Database ${process.env.DATABASE} connected`);
 });
 pool.on("error", (err) => {
-  console.error("PG pool error", err);
+  logger.error({ err }, "PG pool error");
   process.exit(1);
 });
 

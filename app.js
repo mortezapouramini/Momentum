@@ -7,11 +7,14 @@ const authRoutes = require("./src/modules/auth/auth.routes");
 const taskRoutes = require("./src/modules/tasks/task.routes");
 const categoryRoutes = require("./src/modules/categories/category.routes");
 const helmet = require("helmet");
+const pinoHttp = require("pino-http");
+const { logger } = require("./src/config/logger.config");
 
 /** App */
 const app = express();
 
 /** Configs */
+app.use(pinoHttp({ logger }));
 app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());

@@ -4,8 +4,8 @@
   "description": "Task Management Pro",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "worker": "node src/workers/email.worker.js",
     "worker:dev": "nodemon src/workers/email.worker.js",
     "test": "echo \"Error: no test specified\" && exit 1"

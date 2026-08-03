@@ -1,4 +1,4 @@
-const rateLimit = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 const { RedisStore } = require("rate-limit-redis");
 const { redis } = require("../config/redis.config");
 const appError = require("../utils/error.util");
@@ -23,7 +23,7 @@ const loginKeyGenerator = (req) => {
     .toString()
     .trim()
     .toLowerCase();
-  return `${req.ip}:${identifier}`;
+  return `${ipKeyGenerator(req.ip)}:${identifier}`;
 };
 
 const loginLimiter = rateLimit({
@@ -60,7 +60,7 @@ const refreshTokenLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   store: createStore("refresh-token"),
-  keyGenerator: (req) => req.cookies?.refreshToken || req.ip,
+  keyGenerator: (req) => req.cookies?.refreshToken || ipKeyGenerator(req.ip),
   handler: rateLimitHandler,
 });
 

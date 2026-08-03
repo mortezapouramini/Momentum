@@ -32,6 +32,13 @@ worker.on("completed", (job) => {
 worker.on("failed", async (job, err) => {
   logger.error({ err }, `Email not send to ${job.data.email}`);
   const { email, uuid } = job.data;
-  await redis.del(`pending:${uuid}`, `pending:email:${email}`);
+  try {
+    await redis.del(`pending:${uuid}`, `pending:email:${email}`);
+  } catch (error) {
+    logger.error(
+      { err: error, uuid, email },
+      "Error deleting cached email and uuid",
+    );
+  }
 });
 logger.info("Connected to worker");

@@ -6,11 +6,13 @@ const errorResponder = require("./src/middlewares/error.responder");
 const authRoutes = require("./src/modules/auth/auth.routes");
 const taskRoutes = require("./src/modules/tasks/task.routes");
 const categoryRoutes = require("./src/modules/categories/category.routes");
+const helmet = require("helmet");
 
 /** App */
 const app = express();
 
 /** Configs */
+app.use(helmet());
 app.use(cookieParser());
 app.use(express.json());
 app.use(

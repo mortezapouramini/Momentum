@@ -4,6 +4,7 @@ require("dotenv").config({ path: path.join(__dirname, "../../.env") });
 const { Worker } = require("bullmq");
 const { redis } = require("../config/redis.config");
 const { sendMail } = require("../config/email.config");
+const { logger } = require("../config/logger.config");
 
 /** Email Worker */
 const worker = new Worker(
@@ -25,12 +26,19 @@ const worker = new Worker(
 
 /** Worker Events */
 worker.on("completed", (job) => {
-  console.log(`✅ Email has been sent to ${job.data.email}`);
+  logger.info(`Email has been sent to ${job.data.email}`);
 });
 
 worker.on("failed", async (job, err) => {
-  console.error("❌ Email send error :");
-  console.error(`${err.name} : ${err}`);
+  logger.error({ err }, `Email not send to ${job.data.email}`);
   const { email, uuid } = job.data;
-  await redis.del(`pending:${uuid}`, `pending:email:${email}`);
+  try {
+    await redis.del(`pending:${uuid}`, `pending:email:${email}`);
+  } catch (error) {
+    logger.error(
+      { err: error, uuid, email },
+      "Error deleting cached email and uuid",
+    );
+  }
 });
+logger.info("Connected to worker");

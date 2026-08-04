@@ -9,5 +9,5 @@ const { logger } = require("./src/config/logger.config");
 /** Start Server */
 const port = process.env.SERVER_PORT || 5000;
 app.listen(port, () => {
-  logger.info(`Server started on port ${port} in ${process.env.NODE_ENV}`);
+  logger.info({ port, env: process.env.NODE_ENV }, "Server started");
 });

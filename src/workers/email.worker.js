@@ -26,12 +26,12 @@ const worker = new Worker(
 
 /** Worker Events */
 worker.on("completed", (job) => {
-  logger.info(`Email has been sent to ${job.data.email}`);
+  logger.info({ email: job.data.email, jobId: job.id }, "Email sent");
 });
 
 worker.on("failed", async (job, err) => {
-  logger.error({ err }, `Email not send to ${job.data.email}`);
   const { email, uuid } = job.data;
+  logger.error({ err, email, jobId: job.id }, "Email not sent");
   try {
     await redis.del(`pending:${uuid}`, `pending:email:${email}`);
   } catch (error) {

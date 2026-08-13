@@ -8,7 +8,7 @@
     "dev": "nodemon index.js",
     "worker": "node src/workers/email.worker.js",
     "worker:dev": "nodemon src/workers/email.worker.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -40,6 +40,7 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "jest": "^30.4.2",
     "nodemon": "^3.1.14"
   }
 }

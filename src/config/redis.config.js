@@ -4,7 +4,7 @@ const { logger } = require("./logger.config");
 const redis = new Redis({
   port: process.env.REDIS_PORT,
   host: process.env.REDIS_HOST,
-  // password: 'yourpassword',
+  db: process.env.REDIS_DB ? Number(process.env.REDIS_DB) : 0,
   maxRetriesPerRequest: null,
   retryStrategy: (times) => {
     if (times >= 5) return null;
@@ -18,7 +18,9 @@ redis.on("connect", () => {
 
 redis.on("error", (err) => {
   logger.error({ err }, "Redis connection error");
-  process.exit(1);
+  if (process.env.NODE_ENV !== "test") {
+    process.exit(1);
+  }
 });
 
 module.exports = { redis };

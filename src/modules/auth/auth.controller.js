@@ -5,6 +5,7 @@ const { tokenService } = require("../../shared/token.service");
 const ROUTES = require("../../constants/routes");
 const { cookieOptions } = require("../../config/cookie.config");
 const appError = require("../../utils/error.util");
+const getUserAgent = require("../../utils/getUserAgent");
 
 /** Register User */
 const registerUser = async (req, res, next) => {
@@ -25,7 +26,7 @@ const registerUser = async (req, res, next) => {
 const verifyEmail = async (req, res, next) => {
   const uuid = req.cookies.uuid;
   const verifyCode = req.body.verifyCode;
-  const userAgent = req.headers["user-agent"];
+  const userAgent = getUserAgent(req);
   const ipAddress = req.ip;
 
   try {
@@ -55,7 +56,7 @@ const verifyEmail = async (req, res, next) => {
 
 /** Log In */
 const loginUser = async (req, res, next) => {
-  const userAgent = req.headers["user-agent"];
+  const userAgent = getUserAgent(req);
   const ipAddress = req.ip;
   try {
     const { user, refreshToken, accessJwt } = await authService.loginService({
@@ -87,7 +88,7 @@ const logOutUser = async (req, res, next) => {
 
 /** Get New Refresh Token */
 const getNewRefreshToken = async (req, res, next) => {
-  const userAgent = req.headers["user-agent"];
+  const userAgent = getUserAgent(req);
   const ipAddress = req.ip;
   const refreshToken = req.cookies.refreshToken;
   try {

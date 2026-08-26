@@ -51,7 +51,7 @@ describe("POST api/v1/auth/verify-email", () => {
     });
 
     expect(registerResponse.status).toBe(200);
-
+    
     const setCookieHeader = registerResponse.headers["set-cookie"][0];
     const uuid = setCookieHeader.split("uuid=")[1].split(";")[0];
 

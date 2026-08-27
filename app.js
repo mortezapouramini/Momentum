@@ -20,11 +20,18 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim()),
     credentials: true,
     exposedHeaders: ["authorization"],
   }),
 );
+
+/** Health Check */
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+/** Routes */
 
 /** Routes */
 app.use("/api/v1/auth", authRoutes);

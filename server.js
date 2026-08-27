@@ -2,6 +2,9 @@
 require("dotenv").config({ path: ".env.keys" });
 require("dotenv").config();
 
+const validateEnv = require("./src/config/env.validation");
+validateEnv();
+
 /** App */
 const app = require("./app");
 const { logger } = require("./src/config/logger.config");

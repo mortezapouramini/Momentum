@@ -26,6 +26,13 @@ app.use(
   }),
 );
 
+/** Health Check */
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+/** Routes */
+
 /** Routes */
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/tasks", taskRoutes);

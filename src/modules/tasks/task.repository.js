@@ -144,10 +144,16 @@ const getTasksByFilters = async (userId, filters) => {
 };
 
 const getTasksByUserId = async (userId) => {
-  const query = `
-  SELECT * FROM tasks
-  WHERE user_id = $1
-  ORDER BY created_at DESC
+  const query = `SELECT t.*,
+  COALESCE(
+    array_agg(tc.category_id) FILTER (WHERE tc.category_id IS NOT NULL),
+    '{}'
+  ) AS category_ids
+  FROM tasks t
+  LEFT JOIN task_categories tc ON tc.task_id = t.id
+  WHERE t.user_id = $1
+  GROUP BY t.id
+  ORDER BY t.created_at DESC;
 `;
 
   return (await pool.query(query, [userId])).rows;

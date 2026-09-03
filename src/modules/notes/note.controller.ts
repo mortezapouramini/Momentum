@@ -1,8 +1,15 @@
+import { NextFunction, Request, Response } from "express";
+import {AuthRequest} from "../../types/express"
+
 const responder = require("../../utils/responder");
 const noteService = require("./note.service");
 
 /** Add Note */
-const createNote = async (req, res, next) => {
+const createNote = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const note = await noteService.createNoteService({
       data: req.body,
@@ -16,7 +23,11 @@ const createNote = async (req, res, next) => {
 };
 
 /** Delete Note */
-const deleteNote = async (req, res, next) => {
+const deleteNote = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const deleted = await noteService.deleteNoteService({
       noteId: req.params.noteId,
@@ -30,7 +41,11 @@ const deleteNote = async (req, res, next) => {
 };
 
 /** Get All Notes */
-const getTaskNotes = async (req, res, next) => {
+const getTaskNotes = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const notes = await noteService.getTaskNotesService(
       req.params.taskId,
@@ -42,7 +57,11 @@ const getTaskNotes = async (req, res, next) => {
   }
 };
 
-const updateNote = async (req, res, next) => {
+const updateNote = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const updated = await noteService.updateNoteService({
       content: req.body.content,

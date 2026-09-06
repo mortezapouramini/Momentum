@@ -24,19 +24,15 @@ const registerUser = async (req, res, next) => {
 
 /** Verifi Email */
 const verifyEmail = async (req, res, next) => {
-  const uuid = req.cookies.uuid;
-  const verifyCode = req.body.verifyCode;
-  const userAgent = getUserAgent(req);
-  const ipAddress = req.ip;
-
+  const verifyUserData = {
+    uuid: req.cookies.uuid,
+    verifyCode: req.body.verifyCode,
+    userAgent: getUserAgent(req),
+    ipAddress: req.ip,
+  };
   try {
     const { user, accessJwt, refreshToken } =
-      await authService.verifyEmailService({
-        uuid,
-        verifyCode,
-        userAgent,
-        ipAddress,
-      });
+      await authService.verifyEmailService(verifyUserData);
     res.clearCookie("uuid", cookieOptions.uuid);
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
@@ -56,14 +52,14 @@ const verifyEmail = async (req, res, next) => {
 
 /** Log In */
 const loginUser = async (req, res, next) => {
-  const userAgent = getUserAgent(req);
-  const ipAddress = req.ip;
+  const userLoginData = {
+    ...req.body,
+    userAgent: getUserAgent(req),
+    ipAddress: req.ip,
+  };
   try {
-    const { user, refreshToken, accessJwt } = await authService.loginService({
-      data: req.body,
-      userAgent,
-      ipAddress,
-    });
+    const { user, refreshToken, accessJwt } =
+      await authService.loginService(userLoginData);
     res.cookie("refreshToken", refreshToken, cookieOptions.refreshToken);
     res.set("authorization", `bearer ${accessJwt}`);
     responder({ res, data: user, message: "Login successful" });

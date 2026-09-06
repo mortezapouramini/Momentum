@@ -4,19 +4,16 @@
     "module": "commonjs",
     "strict": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "types": ["node"],
     "allowJs": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "index.js", "app.js", "server.js"],
   "exclude": [
     "node_modules",
     "dist",
     "tests/**/*",
-    "app.js",
-    "index.js",
-    "server.js",
     "jest.config.js",
     "jest.setup.js"
   ]

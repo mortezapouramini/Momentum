@@ -8,13 +8,13 @@ router
   .post("/", validate(createNoteSchema, "body"), noteController.createNote)
   .delete(
     "/:noteId",
-    validate(uuidParamSchema('noteId'), "params"),
+    validate(uuidParamSchema("noteId"), "params"),
     noteController.deleteNote,
   )
   .get("/", noteController.getTaskNotes)
   .patch(
     "/:noteId",
-    validate(uuidParamSchema('noteId'), "params"),
+    validate(uuidParamSchema("noteId"), "params"),
     validate(createNoteSchema, "body"),
     noteController.updateNote,
   );

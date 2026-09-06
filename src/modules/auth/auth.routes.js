@@ -1,6 +1,6 @@
 /** Requirements */
 const router = require("express").Router();
-const authController = require("../auth/auth.controller");
+const authController = require("./auth.controller");
 const { validate } = require("../../middlewares/validator.middleware");
 const {
   registerSchema,

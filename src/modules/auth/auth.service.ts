@@ -1,3 +1,9 @@
+import {
+  UserLoginInfo,
+  UserRegisterInfo,
+  VerifyUserInfo,
+} from "../../types/models";
+
 /** Requirements */
 const appError = require("../../utils/error.util");
 const crypto = require("crypto");
@@ -13,7 +19,7 @@ const {
 } = require("./auth.repository");
 
 /** Register Service */
-const registerService = async (data) => {
+const registerService = async (data: UserRegisterInfo) => {
   const user =
     (await findUserByEmail(data.email)) ||
     (await findUserByUserName(data.userName));
@@ -58,12 +64,8 @@ const registerService = async (data) => {
 };
 
 /** Verify Email Service */
-const verifyEmailService = async ({
-  uuid,
-  verifyCode,
-  userAgent,
-  ipAddress,
-}) => {
+const verifyEmailService = async (data: VerifyUserInfo) => {
+  const { uuid, verifyCode, userAgent, ipAddress } = data;
   const pendingUser = await redis.hgetall(`pending:${uuid}`);
   if (Object.keys(pendingUser).length === 0) {
     throw appError({
@@ -110,9 +112,10 @@ const verifyEmailService = async ({
 };
 
 /** Log In Service */
-const loginService = async ({ data, userAgent, ipAddress }) => {
+const loginService = async (data: UserLoginInfo) => {
+  const { userAgent, ipAddress } = data;
   let user;
-  if (data.email) {
+  if ("email" in data) {
     user = await findUserByEmail(data.email);
   } else {
     user = await findUserByUserName(data.userName);

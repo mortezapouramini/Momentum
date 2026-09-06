@@ -1,5 +1,5 @@
 const router = require("express").Router({ mergeParams: true });
-const noteController = require("../../../dist/modules/notes/note.controller");
+const noteController = require("./note.controller");
 const { validate } = require("../../middlewares/validator.middleware");
 const { createNoteSchema } = require("./note.schema");
 const { uuidParamSchema } = require("../../shared/param.schema");

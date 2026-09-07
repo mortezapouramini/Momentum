@@ -248,7 +248,7 @@ describe("loginService", () => {
 
     await expect(
       loginService({
-        data: { email: "test@test.com", password: "password-123" },
+        email: "test@test.com", password: "password-123",
         userAgent: "user-agent",
         ipAddress: "ip-123",
       }),
@@ -274,7 +274,7 @@ describe("loginService", () => {
     });
 
     const result = await loginService({
-      data: { email: "test@test.com", password: "password-123" },
+      email: "test@test.com", password: "password-123" ,
       userAgent: "user-agent",
       ipAddress: "ip-123",
     });
@@ -296,7 +296,7 @@ describe("loginService", () => {
     argon2.verify.mockResolvedValue(false);
     await expect(
       loginService({
-        data: { email: "test@test.com", password: "password-123" },
+        email: "test@test.com", password: "password-123",
         userAgent: "user-agent",
         ipAddress: "ip-123",
       }),

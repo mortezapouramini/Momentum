@@ -4,10 +4,10 @@
   "description": "Task Management Pro",
   "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "worker": "node src/workers/email.worker.js",
-    "worker:dev": "nodemon src/workers/email.worker.js",
+    "start": "node dist/index.js",
+    "dev": "nodemon dist/index.js",
+    "worker": "node dist/workers/email.worker.js",
+    "worker:dev": "nodemon dist/workers/email.worker.js",
     "test": "jest"
   },
   "repository": {

@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const errorResponder = require("./src/middlewares/error.responder");
 const authRoutes = require("./src/modules/auth/auth.routes");
 const taskRoutes = require("./src/modules/tasks/task.routes");
+const userRoutes = require("./src/modules/user/user.routes");
 const categoryRoutes = require("./src/modules/categories/category.routes");
 const helmet = require("helmet");
 const pinoHttp = require("pino-http");
@@ -37,6 +38,7 @@ app.get("/health", (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/tasks", taskRoutes);
 app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/users", userRoutes);
 
 /** Error Handler */
 app.use(errorResponder);

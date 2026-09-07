@@ -6,7 +6,12 @@ const validate = (schema, source) => async (req, res, next) => {
       abortEarly: false,
       stripUnknown: true,
     });
-    req[source] = { ...req[source], ...validated };
+    if (source === "query") {
+      Object.keys(req.query).forEach((key) => delete req.query[key]);
+      Object.assign(req.query, validated);
+    } else {
+      req[source] = { ...req[source], ...validated };
+    }
     next();
   } catch (error) {
     next(appError({ code: 400, message: error.errors[0] }));

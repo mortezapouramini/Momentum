@@ -1,3 +1,11 @@
+import {
+  PartialUpdateTask,
+  Task,
+  TaskInputInfo,
+  User,
+} from "../../types/models";
+import { AppError } from "../../utils/error.util";
+
 const {
   insertTask,
   deleteTaskById,
@@ -10,7 +18,10 @@ const {
 } = require("./task.repository");
 const appError = require("../../utils/error.util");
 
-const createTaskService = async (taskData, userId) => {
+const createTaskService = async (
+  taskData: TaskInputInfo,
+  userId: User["id"],
+) => {
   try {
     const insertData = {
       userId,
@@ -24,7 +35,7 @@ const createTaskService = async (taskData, userId) => {
 
     return await insertTask(insertData);
   } catch (error) {
-    if (error.message === "INVALID_CATEGORIES") {
+    if (error instanceof Error && error.message === "INVALID_CATEGORIES") {
       throw appError({
         code: 404,
         message: "One or more categories not found",
@@ -34,7 +45,7 @@ const createTaskService = async (taskData, userId) => {
   }
 };
 
-const deleteTaskService = async (taskId, userId) => {
+const deleteTaskService = async (taskId: Task["id"], userId: User["id"]) => {
   const task = await deleteTaskById(taskId, userId);
   if (!task) {
     throw appError({ code: 404, message: "Task not found" });
@@ -42,7 +53,15 @@ const deleteTaskService = async (taskId, userId) => {
   return task;
 };
 
-const updateTaskService = async ({ taskId, taskData, userId }) => {
+const updateTaskService = async ({
+  taskId,
+  taskData,
+  userId,
+}: {
+  taskId: Task["id"];
+  taskData: PartialUpdateTask;
+  userId: User["id"];
+}) => {
   const UPDATABLE_FIELDS = {
     title: "title",
     description: "description",
@@ -67,7 +86,7 @@ const updateTaskService = async ({ taskId, taskData, userId }) => {
   return task;
 };
 
-const getSingleTaskService = async (taskId, userId) => {
+const getSingleTaskService = async (taskId: Task["id"], userId: User["id"]) => {
   const task = await getTaskById(taskId, userId);
   if (!task) {
     throw appError({ code: 404, message: "Task not found" });
@@ -75,14 +94,18 @@ const getSingleTaskService = async (taskId, userId) => {
   return task;
 };
 
-const getTasksService = async (userId, filters) => {
+const getTasksService = async (userId: User["id"], filters: any) => {
   if (Object.keys(filters).length === 0) {
     return await getTasksByUserId(userId);
   }
   return await getTasksByFilters(userId, filters);
 };
 
-const addCategoryToTaskService = async ({ taskId, categoryId, userId }) => {
+const addCategoryToTaskService = async ({
+  taskId,
+  categoryId,
+  userId,
+}: any) => {
   try {
     const result = await insertCategoryToTaskById({
       taskId,
@@ -94,7 +117,7 @@ const addCategoryToTaskService = async ({ taskId, categoryId, userId }) => {
     }
     return result;
   } catch (error) {
-    if (error.code === "23505") {
+    if (error instanceof AppError && error.code === "23505") {
       throw appError({ code: 400, message: "Task is already in category" });
     }
     throw error;
@@ -104,7 +127,7 @@ const deleteCategoryFromTaskService = async ({
   taskId,
   categoryId,
   userId,
-}) => {
+}: any) => {
   const result = await deleteCategoryFromTaskById({
     taskId,
     categoryId,

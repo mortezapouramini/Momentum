@@ -39,7 +39,8 @@ export interface TaskInputInfo {
   description: string;
   priority: "low" | "medium" | "high";
   status: "pending" | "in-progress" | "done";
-  due_date: Date;
+  dueDate: Date;
+  categoryIds: string[];
 }
 export interface Task extends TaskInputInfo {
   id: string;
@@ -47,3 +48,7 @@ export interface Task extends TaskInputInfo {
   created_at: Date;
   updated_at: Date;
 }
+
+export type PartialUpdateTask = Partial<
+  Omit<Task, "id" | "user_id" | "created_at" | "updated_at">
+>;

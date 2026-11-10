@@ -149,7 +149,6 @@ class TokenService {
     const result = await this.verifyRefreshToken(rawToken);
 
     if (!result.valid) {
-      // یه توکن revoke‌شده دوباره استفاده شده => سیگنال سرقت توکن
       if (
         result.reason === REASONS.SESSION_REVOKED ||
         (result.reason === REASONS.SESSION_EXPIRED && result.userId)
